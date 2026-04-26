@@ -5,25 +5,53 @@ import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { styles } from "@/data/styles";
 import { SplitPill } from "@/components/SplitPill";
+import { GhostButton } from "@/components/GhostButton";
 import { RegistrationMark } from "@/components/RegistrationMark";
 import type { Pose } from "@/data/poses";
 
-const DEFAULT_DURATION = 30;
-const DURATION_STEP = 5;
-const MIN_DURATION = 5;
+export const DEFAULT_DURATION = 30;
+export const DURATION_STEP = 5;
+export const MIN_DURATION = 5;
 
-function formatDuration(seconds: number): string {
+export function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function formatTotalDuration(seconds: number): string {
+export function formatTotalDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   if (m === 0) return `${s}s`;
   if (s === 0) return `${m}m`;
   return `${m}m ${s}s`;
+}
+
+/** Remove selected poses from the list */
+export function removePoses(poses: Pose[], selectedIds: Set<string>): Pose[] {
+  return poses.filter((p) => !selectedIds.has(p.id));
+}
+
+/** Duplicate selected poses, inserting copies after each original */
+export function duplicatePoses(poses: Pose[], selectedIds: Set<string>): Pose[] {
+  const result: Pose[] = [];
+  for (const pose of poses) {
+    result.push(pose);
+    if (selectedIds.has(pose.id)) {
+      result.push({ ...pose });
+    }
+  }
+  return result;
+}
+
+/** Toggle side label for a pose */
+export function toggleSideLabel(
+  sideLabels: Record<string, string>,
+  poseId: string,
+): Record<string, string> {
+  const current = sideLabels[poseId] ?? "L+R";
+  const next = current === "L+R" ? "Right Side" : current === "Right Side" ? "Left Side" : "L+R";
+  return { ...sideLabels, [poseId]: next };
 }
 
 /* --- Icon Button for +/- --- */
@@ -72,23 +100,64 @@ function ReviewCard({
   duration,
   onIncrease,
   onDecrease,
+  editMode,
+  selected,
+  onToggleSelect,
+  sideLabel,
+  onToggleSide,
 }: {
   pose: Pose;
   styleColor: string;
   duration: number;
   onIncrease: () => void;
   onDecrease: () => void;
+  editMode: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
+  sideLabel: string;
+  onToggleSide: () => void;
 }) {
   return (
     <div
       style={{
         background: "var(--card)",
         borderRadius: 18,
-        border: "1px solid var(--rule)",
+        border: selected ? "2px solid var(--ink)" : "1px solid var(--rule)",
         overflow: "hidden",
         position: "relative",
       }}
     >
+      {/* Edit mode checkbox */}
+      {editMode && (
+        <button
+          type="button"
+          onClick={onToggleSelect}
+          aria-label={selected ? "Deselect pose" : "Select pose"}
+          data-testid="edit-checkbox"
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            width: 24,
+            height: 24,
+            borderRadius: 6,
+            border: selected ? "none" : "2px solid var(--ink-2)",
+            background: selected ? "var(--ink)" : "var(--card)",
+            cursor: "pointer",
+            zIndex: 10,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--card)",
+            fontSize: 14,
+            fontWeight: 700,
+            padding: 0,
+          }}
+        >
+          {selected ? "\u2713" : ""}
+        </button>
+      )}
+
       {/* Placeholder image area */}
       <div
         style={{
@@ -106,7 +175,7 @@ function ReviewCard({
           style={{
             position: "absolute",
             top: 8,
-            left: 10,
+            left: editMode ? 38 : 10,
             color: "var(--ink)",
             opacity: 0.7,
           }}
@@ -115,9 +184,11 @@ function ReviewCard({
         </span>
       </div>
 
-      {/* Side badge */}
+      {/* Side badge - toggleable in edit mode */}
       {pose.has_sides && (
-        <div
+        <button
+          type="button"
+          onClick={editMode ? onToggleSide : undefined}
           data-testid="side-badge"
           style={{
             position: "absolute",
@@ -131,10 +202,13 @@ function ReviewCard({
             color: "var(--ink-2)",
             letterSpacing: "0.04em",
             textTransform: "uppercase",
+            border: "none",
+            cursor: editMode ? "pointer" : "default",
+            fontFamily: "inherit",
           }}
         >
-          L+R
-        </div>
+          {sideLabel}
+        </button>
       )}
 
       {/* Content */}
@@ -253,8 +327,11 @@ function OverflowMenu({
 /* --- Review Page --- */
 export default function ReviewPage() {
   const router = useRouter();
-  const { selectedPoses } = useAppContext();
+  const { selectedPoses, setSelectedPoses } = useAppContext();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editSelected, setEditSelected] = useState<Set<string>>(new Set());
+  const [sideLabels, setSideLabels] = useState<Record<string, string>>({});
 
   const [durations, setDurations] = useState<Record<string, number>>(() => {
     const init: Record<string, number> = {};
@@ -295,6 +372,47 @@ export default function ReviewPage() {
       map[s.id] = s.color;
     }
     return map;
+  }, []);
+
+  const toggleEditSelect = useCallback((poseId: string) => {
+    setEditSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(poseId)) next.delete(poseId);
+      else next.add(poseId);
+      return next;
+    });
+  }, []);
+
+  const handleRemove = useCallback(() => {
+    if (editSelected.size === 0) return;
+    const updated = removePoses(selectedPoses, editSelected);
+    setSelectedPoses(updated);
+    // Clean up durations for removed poses
+    setDurations((prev) => {
+      const next = { ...prev };
+      for (const id of editSelected) {
+        delete next[id];
+      }
+      return next;
+    });
+    setEditSelected(new Set());
+  }, [editSelected, selectedPoses, setSelectedPoses]);
+
+  const handleDuplicate = useCallback(() => {
+    if (editSelected.size === 0) return;
+    const updated = duplicatePoses(selectedPoses, editSelected);
+    setSelectedPoses(updated);
+    setEditSelected(new Set());
+  }, [editSelected, selectedPoses, setSelectedPoses]);
+
+  const handleDoneEdit = useCallback(() => {
+    setEditMode(false);
+    setEditSelected(new Set());
+  }, []);
+
+  const handleEnterEdit = useCallback(() => {
+    setEditMode(true);
+    setMenuOpen(false);
   }, []);
 
   if (selectedPoses.length === 0) {
@@ -347,20 +465,30 @@ export default function ReviewPage() {
             &#8592;
           </button>
           <div>
-            <p className="eyebrow" style={{ marginBottom: 4 }}>Review</p>
+            <p className="eyebrow" style={{ marginBottom: 4 }}>
+              {editMode ? "Edit Mode" : "Review"}
+            </p>
             <p className="display-md" style={{ color: "var(--ink)" }}>
-              {selectedPoses.length} Pose{selectedPoses.length !== 1 ? "s" : ""}
+              {editMode
+                ? `${editSelected.size} Selected`
+                : `${selectedPoses.length} Pose${selectedPoses.length !== 1 ? "s" : ""}`}
             </p>
           </div>
         </div>
-        <OverflowMenu
-          open={menuOpen}
-          onToggle={() => setMenuOpen((v) => !v)}
-          onSave={() => {
-            setMenuOpen(false);
-            // US-008 will wire this to a save modal
-          }}
-        />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {!editMode && (
+            <GhostButton label="Edit" onClick={handleEnterEdit} />
+          )}
+          {!editMode && (
+            <OverflowMenu
+              open={menuOpen}
+              onToggle={() => setMenuOpen((v) => !v)}
+              onSave={() => {
+                setMenuOpen(false);
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Registration marks */}
@@ -377,14 +505,19 @@ export default function ReviewPage() {
           gap: 16,
         }}
       >
-        {selectedPoses.map((pose) => (
+        {selectedPoses.map((pose, idx) => (
           <ReviewCard
-            key={pose.id}
+            key={`${pose.id}-${idx}`}
             pose={pose}
             styleColor={styleColorMap[pose.style_id] ?? "#ccc"}
             duration={getDuration(pose.id)}
             onIncrease={() => increaseDuration(pose.id)}
             onDecrease={() => decreaseDuration(pose.id)}
+            editMode={editMode}
+            selected={editSelected.has(pose.id)}
+            onToggleSelect={() => toggleEditSelect(pose.id)}
+            sideLabel={sideLabels[pose.id] ?? "L+R"}
+            onToggleSide={() => setSideLabels((prev) => toggleSideLabel(prev, pose.id))}
           />
         ))}
       </div>
@@ -405,19 +538,31 @@ export default function ReviewPage() {
           zIndex: 50,
         }}
       >
-        {/* Total duration bottom-left */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 18, color: "var(--ink-2)" }}>&#9201;</span>
-          <span
-            className="mono"
-            style={{ color: "var(--ink)", fontSize: 13, fontWeight: 500 }}
-          >
-            {formatTotalDuration(totalDuration)}
-          </span>
-        </div>
+        {editMode ? (
+          <>
+            <div style={{ display: "flex", gap: 8 }}>
+              <GhostButton label="Remove" onClick={handleRemove} />
+              <GhostButton label="Duplicate" onClick={handleDuplicate} />
+            </div>
+            <GhostButton label="Done" onClick={handleDoneEdit} />
+          </>
+        ) : (
+          <>
+            {/* Total duration bottom-left */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18, color: "var(--ink-2)" }}>&#9201;</span>
+              <span
+                className="mono"
+                style={{ color: "var(--ink)", fontSize: 13, fontWeight: 500 }}
+              >
+                {formatTotalDuration(totalDuration)}
+              </span>
+            </div>
 
-        {/* Start button bottom-right */}
-        <SplitPill label="Start" onClick={() => router.push("/player")} />
+            {/* Start button bottom-right */}
+            <SplitPill label="Start" onClick={() => router.push("/player")} />
+          </>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,13 @@ describe("Review page module", () => {
     const mod = await import("../../app/(app)/builder/review/page.tsx");
     assert.equal(typeof mod.default, "function");
   });
+
+  it("exports edit mode helper functions", async () => {
+    const mod = await import("../../app/(app)/builder/review/page.tsx");
+    assert.equal(typeof mod.removePoses, "function");
+    assert.equal(typeof mod.duplicatePoses, "function");
+    assert.equal(typeof mod.toggleSideLabel, "function");
+  });
 });
 
 describe("Review page data requirements", () => {
@@ -115,6 +122,123 @@ describe("Duration controls logic", () => {
     durations["p2"] = 45;
     const total2 = Object.values(durations).reduce((s, d) => s + d, 0);
     assert.equal(total2, 105);
+  });
+});
+
+describe("Edit mode - removePoses", () => {
+  it("removes selected poses from the list", async () => {
+    const { removePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" }, { id: "c" }, { id: "d" },
+    ] as import("../../data/poses.ts").Pose[];
+    const selected = new Set(["b", "d"]);
+    const result = removePoses(poses, selected);
+    assert.equal(result.length, 2);
+    assert.deepEqual(result.map((p) => p.id), ["a", "c"]);
+  });
+
+  it("returns all poses when none selected", async () => {
+    const { removePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" },
+    ] as import("../../data/poses.ts").Pose[];
+    const result = removePoses(poses, new Set());
+    assert.equal(result.length, 2);
+  });
+
+  it("returns empty array when all poses removed", async () => {
+    const { removePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" },
+    ] as import("../../data/poses.ts").Pose[];
+    const result = removePoses(poses, new Set(["a", "b"]));
+    assert.equal(result.length, 0);
+  });
+});
+
+describe("Edit mode - duplicatePoses", () => {
+  it("duplicates selected poses after their position", async () => {
+    const { duplicatePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a", name: "A" }, { id: "b", name: "B" }, { id: "c", name: "C" },
+    ] as import("../../data/poses.ts").Pose[];
+    const selected = new Set(["b"]);
+    const result = duplicatePoses(poses, selected);
+    assert.equal(result.length, 4);
+    assert.deepEqual(result.map((p) => p.id), ["a", "b", "b", "c"]);
+  });
+
+  it("duplicates multiple selected poses", async () => {
+    const { duplicatePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" }, { id: "c" },
+    ] as import("../../data/poses.ts").Pose[];
+    const selected = new Set(["a", "c"]);
+    const result = duplicatePoses(poses, selected);
+    assert.equal(result.length, 5);
+    assert.deepEqual(result.map((p) => p.id), ["a", "a", "b", "c", "c"]);
+  });
+
+  it("does nothing when none selected", async () => {
+    const { duplicatePoses } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" },
+    ] as import("../../data/poses.ts").Pose[];
+    const result = duplicatePoses(poses, new Set());
+    assert.equal(result.length, 2);
+  });
+});
+
+describe("Edit mode - toggleSideLabel", () => {
+  it("cycles L+R to Right Side", async () => {
+    const { toggleSideLabel } = await import("../../app/(app)/builder/review/page.tsx");
+    const result = toggleSideLabel({}, "p1");
+    assert.equal(result["p1"], "Right Side");
+  });
+
+  it("cycles Right Side to Left Side", async () => {
+    const { toggleSideLabel } = await import("../../app/(app)/builder/review/page.tsx");
+    const result = toggleSideLabel({ "p1": "Right Side" }, "p1");
+    assert.equal(result["p1"], "Left Side");
+  });
+
+  it("cycles Left Side back to L+R", async () => {
+    const { toggleSideLabel } = await import("../../app/(app)/builder/review/page.tsx");
+    const result = toggleSideLabel({ "p1": "Left Side" }, "p1");
+    assert.equal(result["p1"], "L+R");
+  });
+
+  it("does not affect other pose labels", async () => {
+    const { toggleSideLabel } = await import("../../app/(app)/builder/review/page.tsx");
+    const result = toggleSideLabel({ "p1": "Right Side", "p2": "Left Side" }, "p1");
+    assert.equal(result["p1"], "Left Side");
+    assert.equal(result["p2"], "Left Side");
+  });
+});
+
+describe("Edit mode - total duration recalculates after removal", () => {
+  it("total duration decreases after removing poses", async () => {
+    const { removePoses, DEFAULT_DURATION } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" }, { id: "c" },
+    ] as import("../../data/poses.ts").Pose[];
+    const totalBefore = poses.length * DEFAULT_DURATION;
+    const afterRemove = removePoses(poses, new Set(["b"]));
+    const totalAfter = afterRemove.length * DEFAULT_DURATION;
+    assert.equal(totalBefore, 90);
+    assert.equal(totalAfter, 60);
+  });
+
+  it("total duration increases after duplicating poses", async () => {
+    const { duplicatePoses, DEFAULT_DURATION } = await import("../../app/(app)/builder/review/page.tsx");
+    const poses = [
+      { id: "a" }, { id: "b" },
+    ] as import("../../data/poses.ts").Pose[];
+    const totalBefore = poses.length * DEFAULT_DURATION;
+    const afterDup = duplicatePoses(poses, new Set(["a"]));
+    const totalAfter = afterDup.length * DEFAULT_DURATION;
+    assert.equal(totalBefore, 60);
+    assert.equal(totalAfter, 90);
   });
 });
 
