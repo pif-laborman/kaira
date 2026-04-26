@@ -49,20 +49,6 @@ function Hero() {
         <span className="reg-mark" style={{ bottom: '22%', left: '8%', color: '#fff', opacity: 0.7 }}/>
         <span className="reg-mark" style={{ bottom: '22%', right: '8%', color: '#fff', opacity: 0.7 }}/>
 
-        {/* Eyebrow tag — left side */}
-        <div className="page" style={{
-          position: 'absolute', top: '20%', left: 0, right: 0, zIndex: 3,
-        }}>
-          <span style={{
-            fontFamily: "'Hanken Grotesk', sans-serif",
-            fontSize: 11, fontWeight: 500,
-            letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: '#fff',
-          }}>
-            Yoga Studio
-          </span>
-        </div>
-
         {/* Centered massive headline */}
         <div className="page" style={{
           position: 'absolute', top: '50%', left: 0, right: 0,
