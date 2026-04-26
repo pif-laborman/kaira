@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { Pose } from "@/data/poses";
 import type { PracticeSession } from "@/data/practice-history";
+import { practiceHistory as seedHistory } from "@/data/practice-history";
 
 export interface SavedSequence {
   id: string;
@@ -69,7 +70,7 @@ const DEFAULT_ONBOARDING: OnboardingData = {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedPoses, setSelectedPoses] = useState<Pose[]>([]);
   const [savedSequences, setSavedSequences] = useState<SavedSequence[]>(SEED_SEQUENCES);
-  const [practiceHistory, setPracticeHistory] = useState<PracticeSession[]>([]);
+  const [practiceHistory, setPracticeHistory] = useState<PracticeSession[]>(seedHistory);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>(DEFAULT_ONBOARDING);
 
   return (
