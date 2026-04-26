@@ -27,6 +27,8 @@ Started: 2026-04-26
 - Reusable Pill component in `src/components/Pill.tsx` (default/dark/outline variants, active state toggle)
 - FilterPanel slide-over in `src/components/FilterPanel.tsx` (search, category pills, chakra pills, clear/done actions)
 - Filter state pattern: local state in panel, applied on Done, parent filters pose list with intersection logic
+- Full-screen views (player, complete, onboarding) use (fullscreen) route group: AppProvider but no BottomNav or paddingBottom
+- Pure state transition functions (tick, skip, toggle) make timer/game logic easy to unit test
 
 ---
 
@@ -149,4 +151,37 @@ Started: 2026-04-26
 - Files changed: src/components/SaveSequenceModal.tsx, src/app/(app)/builder/review/page.tsx, src/app/(app)/library/page.tsx, src/context/AppContext.tsx, src/components/__tests__/SaveSequence.test.ts
 - 12 tests: modal export, context exports, SavedSequence shape, total duration computation, unique id generation, name trim validation, library page export, formatTotalDuration (6 cases), computed vs stored totalDuration, seed pose id integrity
 - **Learnings:** The SavedSequence interface already existed with seed data in AppContext. Adding optional fields (styleId, totalDuration) is non-breaking for existing seeds. Modal overlay pattern (fixed inset backdrop + centered card + stopPropagation) works well for design system modals.
+---
+
+## 2026-04-26 - US-009: Pose detail modal with illustration, video area, accordions, and chakras
+- Created PoseDetailModal slide-over component (src/components/PoseDetailModal.tsx): slides up from bottom with style-colored header block
+- Pose name displayed in display-md, Sanskrit name in body/ink-3 italic
+- Placeholder video area: gray box (card-2 bg) with SVG play icon circle
+- Precautions expandable/collapsible section: renders bullet list from pose.precautions, fallback text when empty
+- How to Practice expandable/collapsible section: renders pose.detailed_instructions as paragraph
+- 7 chakra circles: all chakras rendered, active ones highlighted with their color, inactive shown as faded card-2
+- Close X button on top-right of modal dismisses it
+- Wired into builder: added info (i) button on each PoseCard, clicking opens PoseDetailModal for that pose
+- PoseCard refactored from single button to div with nested toggle button + info button for separate actions
+- Files changed: src/components/PoseDetailModal.tsx (new), src/components/__tests__/PoseDetailModal.test.ts (new), src/app/(app)/builder/page.tsx (modified)
+- 14 tests: module export, detailed_instructions field check, precautions array check, chakra id validation, style_id validation, 7 chakras count, chakra fields, chakra order, style hex colors, style lookup mapping, accordion toggle logic (2), independent accordion state, non-empty precautions check
+- **Learnings:** AccordionSection pattern (button with toggle + conditional children) is reusable. For cards that need both selection and detail actions, split into a wrapper div with separate buttons rather than nesting buttons. The slide-over modal pattern (alignItems: flex-end + bottom border-radius) works well for detail views.
+---
+
+## 2026-04-26 - US-010: Sequence Player with countdown, timer, transport controls, and auto-advance
+- Created (fullscreen) route group with AppProvider but no BottomNav for full-screen views
+- Created /player route at src/app/(fullscreen)/player/page.tsx
+- 3-2-1 countdown displays before each pose in display-xl typography
+- Current pose card with style color placeholder, name, Sanskrit name; countdown timer in MM:SS mono font; next pose preview
+- Transport controls: skip back, pause/play (filled), skip forward icon buttons at 44x44px
+- Pause stops the timer, play resumes; skip forward/back navigate poses
+- Progress bar at top shows current position as percentage
+- Auto-advance when timer reaches zero transitions to next pose countdown
+- After last pose completes, records session to practiceHistory in context and navigates to /complete
+- Close X exits to review screen (/builder/review)
+- Empty state redirects to builder when no poses selected
+- Exported pure helper functions (formatTimer, getProgressPercent, createInitialState, tickCountdown, tickPoseTimer, skipForward, skipBack, togglePause) for testability
+- Files changed: src/app/(fullscreen)/layout.tsx (new), src/app/(fullscreen)/player/page.tsx (new), src/components/__tests__/Player.test.ts (new)
+- 27 tests: formatTimer (5 cases), getProgressPercent (4 cases), createInitialState, tickCountdown (4 cases), tickPoseTimer (4 cases), skipForward (2 cases), skipBack (2 cases), togglePause (2 cases), DEFAULT_DURATION check
+- **Learnings:** Full-screen views (player, onboarding, complete) need a separate route group like (fullscreen) with AppProvider but no BottomNav. Pure state transition functions make timer logic easy to test without DOM rendering. The setInterval + useEffect pattern with cleanup on unmount handles timer lifecycle cleanly.
 ---
