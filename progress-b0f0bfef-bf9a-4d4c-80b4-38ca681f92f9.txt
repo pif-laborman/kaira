@@ -185,3 +185,18 @@ Started: 2026-04-26
 - 27 tests: formatTimer (5 cases), getProgressPercent (4 cases), createInitialState, tickCountdown (4 cases), tickPoseTimer (4 cases), skipForward (2 cases), skipBack (2 cases), togglePause (2 cases), DEFAULT_DURATION check
 - **Learnings:** Full-screen views (player, onboarding, complete) need a separate route group like (fullscreen) with AppProvider but no BottomNav. Pure state transition functions make timer logic easy to test without DOM rendering. The setInterval + useEffect pattern with cleanup on unmount handles timer lifecycle cleanly.
 ---
+
+## 2026-04-26 - US-011: Workout Complete screen with stats, streak, and action buttons
+- Created /complete route at src/app/(fullscreen)/complete/page.tsx in the fullscreen route group (no BottomNav)
+- Large checkmark icon in blush circle at display-xl scale
+- 'Practice Complete' heading in display-lg with subtitle
+- Stats summary section on bg-2 background: total duration (MM:SS mono), pose count, style name
+- Streak indicator calculated from practiceHistory dates: consecutive day count with dot visualization
+- 'Save to Library' split-pill appears only if current sequence is not already saved
+- 'Practice Again' ghost button navigates to /player to replay
+- 'Back to Home' ghost button navigates to /home
+- Exported pure helper functions (formatDuration, calculateStreak) for testability
+- Files changed: src/app/(fullscreen)/complete/page.tsx (new), src/components/__tests__/Complete.test.ts (new)
+- 18 tests: module exports, formatDuration (5 cases), calculateStreak (8 cases: empty, today, consecutive, duplicates, gap, stale, yesterday start, unordered), data integrity (styles, practice sessions, SplitPill, GhostButton exports)
+- **Learnings:** Streak calculation needs to handle: deduplication of dates, yesterday as valid start, unordered input. The complete page reads the most recent practiceHistory entry (just recorded by player) for session stats.
+---
