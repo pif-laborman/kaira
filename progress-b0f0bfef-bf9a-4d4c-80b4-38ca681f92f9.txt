@@ -233,3 +233,18 @@ Started: 2026-04-26
 - 21 tests: module exports, formatDuration (5 cases), resolveFlowPoses (4 cases: valid ids, invalid ids, empty, order preservation), premade flow data integrity (8 cases: valid style_ids, valid pose_ids, teacher names, descriptions, difficulty, duration, unique ids, full resolution), duration constants (3 cases)
 - **Learnings:** resolveFlowPoses pattern (Map lookup from pose array, filter Boolean) is reusable for any pose_ids array resolution. The flow detail page reuses the same pose card layout as review but without edit mode.
 ---
+
+## 2026-04-26 - US-014: Explore screen with pre-made flows by category and by style
+- Replaced stub explore page with full Explore screen at src/app/(app)/explore/page.tsx
+- 'Explore' heading in display-lg typography
+- Pre-Made Sequences section: horizontal scroll of 5 explore categories (Energy Boost, Emotional Release, Posture, Detoxing, Intuition) with placeholder illustration, name, practice count pill
+- Clicking a category card toggles a filtered list of pre-made flows below the carousel
+- FlowListCard shows style color swatch, flow name, duration + difficulty pills, arrow link to /flow/[id]
+- By Style section: horizontal scroll of 7 style cards with style color header, name, practice count in mono
+- Carousel counters (mono fraction + icon buttons) on both sections via CarouselCounter component
+- Exported pure helpers: getFlowsForCategory, getFlowCountForStyle, exploreCategories for testability
+- ExploreCategory interface maps category names to flowIds for flexible flow-to-category assignment
+- Files changed: src/app/(app)/explore/page.tsx (modified), src/components/__tests__/Explore.test.ts (new)
+- 20 tests: module exports, 5 category names, unique ids, flowId validity, getFlowsForCategory (3 cases: matching, unknown, order preservation), getFlowCountForStyle (4 cases: with flows, no flows, unknown, all styles), data integrity (4 cases)
+- **Learnings:** Explore categories are distinct from pose categories - they group premade flows, not poses. The ExploreCategory type with flowIds array allows flexible many-to-many mapping without modifying PremadeFlow. App source imports use bare paths (no .ts extension), only test imports use explicit extensions.
+---
