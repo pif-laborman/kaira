@@ -248,3 +248,16 @@ Started: 2026-04-26
 - 20 tests: module exports, 5 category names, unique ids, flowId validity, getFlowsForCategory (3 cases: matching, unknown, order preservation), getFlowCountForStyle (4 cases: with flows, no flows, unknown, all styles), data integrity (4 cases)
 - **Learnings:** Explore categories are distinct from pose categories - they group premade flows, not poses. The ExploreCategory type with flowIds array allows flexible many-to-many mapping without modifying PremadeFlow. App source imports use bare paths (no .ts extension), only test imports use explicit extensions.
 ---
+
+## 2026-04-26 - US-015: Profile screen with avatar, settings, and version info
+- Replaced stub profile page with full Profile screen at src/app/(app)/profile/page.tsx
+- Placeholder avatar circle (88px, bg-2 background) with UserIcon SVG component
+- Name 'Kaira User' in display-sm and email 'hello@kaira.app' in small/ink-3
+- Settings section with eyebrow label: Play pose name toggle (ToggleSwitch component), Practice Stats link to /progress, Customer Center row, Log Out row
+- ToggleSwitch: 48x28px toggle with ink/rule background states, animated knob, role="switch" + aria-checked
+- Exported pure togglePoseName helper for testability
+- Version 'v1.0.0' in mono/ink-3 at bottom center
+- Files changed: src/app/(app)/profile/page.tsx, src/components/__tests__/Profile.test.ts (new)
+- 13 tests: module exports (4), togglePoseName (3 cases: false->true, true->false, idempotent), profile data (3: name, email, version), RegistrationMark import, settings rows (2: labels, link href)
+- **Learnings:** ToggleSwitch with role="switch" + aria-checked is the accessible pattern for toggle settings. SettingsRow is a simple flex row pattern reusable for settings lists.
+---
