@@ -17,6 +17,66 @@
   --font-display: 'Inter', sans-serif;
 }
 
+/* Design System Tokens (DESIGN.md) */
+:root {
+  /* Surface */
+  --bg: #ffffff;
+  --bg-2: #f5f2ec;
+  --card: #ffffff;
+  --card-2: #fafaf7;
+  /* Accent */
+  --blush: #f4e9e3;
+  --blush-2: #e8d8cc;
+  /* Ink */
+  --ink: #14130f;
+  --ink-2: #2a2926;
+  --ink-3: #6b6a64;
+  --rule: #e6e3dc;
+  --rule-2: #efece5;
+  /* Tags & Pills */
+  --tag-bg: #f3f0ea;
+  --pill: #14130f;
+  --pill-ink: #ffffff;
+
+  /* Spacing */
+  --space-xs: 12px;
+  --space-sm: 20px;
+  --space-md: 32px;
+  --space-lg: 48px;
+  --space-xl: 72px;
+  --space-2xl: 96px;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-snap: cubic-bezier(.65, 0, .35, 1);
+  --ease-content: cubic-bezier(.22, 1, .36, 1);
+  --dur-snap: 350ms;
+  --dur-content: 520ms;
+  --dur-wash: 200ms;
+}
+
+/* Typography classes from DESIGN.md */
+.display-xl { font-weight: 700; font-size: clamp(40px, 6.4vw, 84px); line-height: 1.05; letter-spacing: -0.025em; }
+.display-lg { font-weight: 700; font-size: clamp(32px, 4.4vw, 60px); line-height: 1.08; letter-spacing: -0.022em; }
+.display-md { font-weight: 600; font-size: clamp(24px, 2.8vw, 40px); line-height: 1.15; letter-spacing: -0.018em; }
+.display-cap { font-weight: 700; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.05; letter-spacing: 0.01em; text-transform: uppercase; }
+.display-sm { font-weight: 600; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.2; letter-spacing: -0.01em; }
+.body-lg { font-size: clamp(16px, 1.25vw, 19px); line-height: 1.55; color: var(--ink-2); }
+.body-text { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.small { font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+.mono { font-family: var(--font-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); }
+
+/* Section rhythm */
+.frame { padding: clamp(48px, 6vw, 96px) 0; }
+.page { max-width: 1320px; margin: 0 auto; padding-left: clamp(16px, 3vw, 40px); padding-right: clamp(16px, 3vw, 40px); }
+
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;

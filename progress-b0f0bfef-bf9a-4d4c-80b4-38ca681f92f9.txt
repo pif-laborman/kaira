@@ -1,0 +1,324 @@
+# Progress Log
+Run: b0f0bfef-bf9a-4d4c-80b4-38ca681f92f9
+Task: Build Kaira yoga app frontend prototype (19 stories)
+Started: 2026-04-26
+
+## Codebase Patterns
+- Data fixtures live in `src/data/` with barrel re-export from `src/data/index.ts`
+- Each data file exports an explicit TypeScript interface and a named const array
+- Tests use `node:test` + `node:assert/strict`, run with `npm test` (which runs `node --import tsx --test`)
+- Test imports MUST use explicit file extensions (`.ts`, `.tsx`) for Node ESM resolution
+- tsx is installed as a dev dependency for running TS tests
+- Next.js 16 App Router with `src/app/` for routes
+- Landing page served from `public/landing/` via middleware rewrite on `/`
+- TypeScript strict mode, path alias `@/*` maps to `./src/*`
+- Design system tokens defined in DESIGN.md, CSS variables in globals.css
+- App routes use (app) route group with shared layout that includes BottomNav + AppProvider
+- Components live in `src/components/`, context in `src/context/`
+- App home is at `/home` (not `/`, which is the landing page via middleware rewrite)
+- Fonts: Hanken Grotesk (--font-sans) and JetBrains Mono (--font-mono) loaded via next/font
+- BottomNav is a fixed bottom bar, pages need paddingBottom: 80 to avoid overlap
+- CarouselCounter component in `src/components/CarouselCounter.tsx` for mono fraction + nav buttons
+- ScrollSection pattern: encapsulate useRef + useState in a component to avoid react-hooks/refs lint errors
+- Horizontal scroll containers: use `overflowX: auto`, `scrollSnapType: x mandatory`, `scrollbarWidth: none`
+- Pages using `useSearchParams` must wrap content in `<Suspense>` for Next.js 16 static generation
+- Reusable SplitPill component in `src/components/SplitPill.tsx` (label + arrow, hover animation, sm/inverted variants)
+- Reusable GhostButton component in `src/components/GhostButton.tsx` (1px border, uppercase, hover flood)
+- Reusable Pill component in `src/components/Pill.tsx` (default/dark/outline variants, active state toggle)
+- FilterPanel slide-over in `src/components/FilterPanel.tsx` (search, category pills, chakra pills, clear/done actions)
+- Filter state pattern: local state in panel, applied on Done, parent filters pose list with intersection logic
+- Full-screen views (player, complete, onboarding) use (fullscreen) route group: AppProvider but no BottomNav or paddingBottom
+- Pure state transition functions (tick, skip, toggle) make timer/game logic easy to unit test
+
+---
+
+## 2026-04-26 - US-001: Placeholder data fixtures and TypeScript types
+- Created 8 data fixture files in src/data/
+- styles.ts: 7 yoga styles (Hatha Vinyasa, Yin, Mudra, Chair, Pranayama, Restorative, Kundalini)
+- chakras.ts: 7 chakras with colors
+- categories.ts: 6 categories (Backbends, Inversions, Arm Balances, Seated, Advanced, Slow Down)
+- poses.ts: 53 poses across all 7 styles with full fields (id, number, name, sanskrit_name, instructions, precautions, style_id, chakras, categories, has_sides, duration)
+- premade-flows.ts: 5 flows referencing real pose ids
+- practice-history.ts: 10 sessions with dynamic dates (last 2 weeks)
+- onboarding.ts: 4 goals, 4 pain points, 4 tinder statements, testimonials per goal, 3 processing messages
+- index.ts: barrel re-export
+- 30 tests verifying array lengths, required fields, unique ids, and referential integrity
+- **Learnings:** node:test with tsx works well for data-only tests without needing jest/vitest setup
+---
+
+## 2026-04-26 - US-002: App shell, global styles, React Context, and bottom tab navigation
+- Added all 16 design system CSS variables to globals.css (--ink, --ink-2, --ink-3, --bg, --bg-2, --card, --card-2, --blush, --blush-2, --rule, --rule-2, --tag-bg, --pill, --pill-ink) plus spacing, radius, and motion tokens
+- Configured Hanken Grotesk (400-800) and JetBrains Mono (400-500) via next/font/google in layout.tsx
+- Created AppContext (src/context/AppContext.tsx) with state for selectedPoses, savedSequences (pre-seeded with 2 examples), practiceHistory, onboardingData
+- Created BottomNav component (src/components/BottomNav.tsx) with 4 tabs: Home, Explore, Library, Profile. Active tab uses --ink, inactive uses --ink-3
+- Created RegistrationMark component (src/components/RegistrationMark.tsx): 14x14 crosses, --ink-3 color, 0.55 opacity
+- Created (app) route group with shared layout that wraps children in AppProvider and includes BottomNav
+- Added route stubs: /home, /explore, /library, /profile
+- Added typography utility classes from DESIGN.md (display-xl, display-lg, display-md, display-cap, display-sm, body-lg, body-text, small, mono, eyebrow)
+- Files changed: src/app/globals.css, src/app/layout.tsx, src/app/(app)/layout.tsx, src/app/(app)/home/page.tsx, src/app/(app)/explore/page.tsx, src/app/(app)/library/page.tsx, src/app/(app)/profile/page.tsx, src/components/BottomNav.tsx, src/components/RegistrationMark.tsx, src/context/AppContext.tsx
+- 4 tests: module export checks for BottomNav, RegistrationMark, AppProvider, useAppContext
+- **Learnings:** next/font variable names map to CSS custom properties; use className on html tag to apply. The (app) route group keeps BottomNav isolated from the landing page route
+---
+
+## 2026-04-26 - US-003: Home screen with greeting, style cards, daily flows, and categories
+- Replaced stub home page with full Home screen at src/app/(app)/home/page.tsx
+- Time-based greeting: Good morning/afternoon/evening, Yogi
+- Pick a Yoga Style section: 7 style cards (horizontal scroll) with color swatch + name, links to /builder?style=[name]
+- Daily Practice section: 4 pre-made flow cards with placeholder image, name, duration pill, difficulty pill, links to /flow/[id]
+- Explore by Category section: 6 category cards with name + computed pose count
+- Created CarouselCounter component (src/components/CarouselCounter.tsx): mono fraction + icon button nav
+- Created ScrollSection component (inline) encapsulating ref + state to satisfy react-hooks/refs lint rule
+- Registration marks at section corners per design system
+- Design tokens used: eyebrow, display-md, display-lg, display-sm, body-lg, mono, --tag-bg pills, --card, --card-2, --rule, --bg-2
+- Files changed: src/app/(app)/home/page.tsx, src/components/CarouselCounter.tsx
+- 8 tests: CarouselCounter export, 7 styles count, style fields, premade flows count, flow fields, categories count, category pose counts, greeting logic
+- **Learnings:** React hooks lint (react-hooks/refs) disallows accessing useRef value during render - encapsulate ref in the component that owns the DOM node. The ScrollSection pattern works well for repeated horizontal scroll sections.
+---
+
+## 2026-04-26 - US-004: Sequence Builder - style selection and pose browsing with selection
+- Created /builder route at src/app/(app)/builder/page.tsx
+- Style selector at top showing current style name, reads ?style= query param (defaults to Hatha Vinyasa)
+- Style grid overlay modal: 7 styles with color swatch + name, selected style gets highlighted border
+- Selecting a style closes overlay and filters the pose grid to that style's poses
+- Scrollable grid of pose cards: number, placeholder color block (style color), name, Sanskrit name, instruction text, 18px border-radius
+- Click card to add/remove from selectedPoses in AppContext
+- Selected poses shown in horizontal strip at top with count, click thumbnail to remove
+- Bottom bar: Filters ghost button + Next split-pill button
+- Next navigates to /builder/review, Close X navigates to /home
+- Created reusable SplitPill component (src/components/SplitPill.tsx): label + arrow, 52px height, sm/inverted variants, hover animation per DESIGN.md
+- Created reusable GhostButton component (src/components/GhostButton.tsx): 1px border, uppercase, hover flood per DESIGN.md
+- Files changed: src/app/(app)/builder/page.tsx, src/components/SplitPill.tsx, src/components/GhostButton.tsx
+- 11 tests: component exports, data requirements (7 styles, default style, style colors, pose-style integrity, min poses per style, pose fields, filtering, selection/removal, toggle logic)
+- **Learnings:** Next.js 16 requires `useSearchParams` to be wrapped in `<Suspense>` boundary for static generation. The pattern is to create a wrapper default export that renders `<Suspense><Content /></Suspense>` where Content uses the hooks.
+---
+
+## 2026-04-26 - US-005: Sequence Builder - filter panel with category and chakra multi-select
+- Created reusable Pill component (src/components/Pill.tsx): 3 variants (default, dark, outline) with active state toggle
+- Created FilterPanel slide-over component (src/components/FilterPanel.tsx): search input, 6 category pills, 7 chakra pills, clear/done footer
+- Integrated filters into builder page: Filters button opens slide-over, pose grid re-renders showing intersection of style + search + category + chakra filters
+- Filters button shows active filter count badge
+- Filter state is local in the panel until Done is pressed, then applied to parent
+- Files changed: src/app/(app)/builder/page.tsx, src/components/Pill.tsx, src/components/FilterPanel.tsx
+- 17 tests: Pill + FilterPanel module exports, emptyFilters shape, 6 categories, 7 chakras, expected names, data arrays, search by name/Sanskrit, category/chakra filtering, combined filters, empty filters, clear reset
+- **Learnings:** Filter panel pattern: keep local state in the panel component, apply on Done click. This avoids jittery re-renders while user is selecting. The Pill component's active prop + onClick combo works well for multi-select pill groups.
+---
+
+## 2026-04-26 - US-005 (fix): Test import extensions
+- Fixed all test files to use explicit `.tsx`/`.ts` extensions in dynamic and static imports
+- Added `npm test` script to package.json with `node --import tsx --test` glob
+- Files changed: package.json, all 7 test files under src/*/__tests__/
+- **Learnings:** Node's native ESM test runner requires explicit file extensions in imports. The tsx loader handles transpilation but doesn't resolve bare module paths. Always use `.ts`/`.tsx` extensions in test imports.
+---
+
+## 2026-04-26 - US-006: Sequence Review screen with duration controls and total time
+- Created /builder/review route at src/app/(app)/builder/review/page.tsx
+- 3-column grid of selected poses from AppContext, each with placeholder image area, pose name, duration controls
+- Duration displayed in MM:SS mono format, adjustable via +/- buttons in 5-second increments
+- Default duration 30 seconds per pose, minimum 5 seconds
+- Side badge (L+R) on poses where has_sides is true using blush background pill
+- Total sequence duration in bottom-left with clock icon in mono font
+- Start split-pill button bottom-right navigates to /player
+- Back arrow icon button navigates to /builder
+- Overflow menu (...) with Save to Library dropdown option (placeholder for US-008)
+- Empty state when no poses selected, with CTA to go back to builder
+- Files changed: src/app/(app)/builder/review/page.tsx, src/components/__tests__/Review.test.ts
+- 17 tests: module export, has_sides field check, poses with sides exist, default_duration_seconds field, style-color mapping, MM:SS formatting (5 cases), duration controls logic (5 cases), total duration formatting (3 cases)
+- **Learnings:** The review page reads selectedPoses from AppContext set during the builder step. Duration state is local to the review page using a Record<string, number> keyed by pose id. The formatDuration helper uses padStart for consistent MM:SS display.
+---
+
+## 2026-04-26 - US-007: Sequence edit mode with multi-select, remove, duplicate, side toggle
+- Added Edit button (GhostButton) to review screen top bar, enters edit mode
+- Edit mode shows checkboxes on each pose card for multi-select, selected cards get 2px solid --ink border
+- Bottom bar switches to Remove, Duplicate, Done buttons in edit mode
+- Side badge on has_sides poses is toggleable in edit mode: cycles L+R -> Right Side -> Left Side -> L+R
+- Remove deletes selected poses from AppContext and cleans up duration state
+- Duplicate inserts copies of selected poses immediately after their originals
+- Done exits edit mode, clears selection
+- Exported pure helper functions (removePoses, duplicatePoses, toggleSideLabel) for testability
+- Files changed: src/app/(app)/builder/review/page.tsx, src/components/__tests__/Review.test.ts
+- 12 new tests: module exports check, removePoses (3 cases), duplicatePoses (3 cases), toggleSideLabel (4 cases), duration recalculation after remove/duplicate (2 cases)
+- **Learnings:** Exporting pure functions from page components makes unit testing edit operations straightforward without needing DOM rendering. The key pattern for duplicate-in-place is iterating the array and pushing the original + copy when selected.
+---
+
+## 2026-04-26 - US-008: Save sequence modal and library persistence in React state
+- Created SaveSequenceModal component (src/components/SaveSequenceModal.tsx): design system card (18px radius, card padding), name input, Cancel (ghost style) and Save (pill style) buttons
+- Wired overflow menu "Save to Library" on review screen to open modal
+- Save creates a SavedSequence in React Context with: id (Date.now), name, poseIds, durations map, styleId (from first pose), totalDuration, createdAt
+- Added styleId and totalDuration optional fields to SavedSequence interface in AppContext
+- Success toast ("Saved to Library") shown for 2 seconds after saving, modal closes and returns to review screen
+- Updated Library page to render all saved sequences with style color swatch, sequence name, pose count, total duration, style name, and date
+- Empty state message when no sequences saved
+- Files changed: src/components/SaveSequenceModal.tsx, src/app/(app)/builder/review/page.tsx, src/app/(app)/library/page.tsx, src/context/AppContext.tsx, src/components/__tests__/SaveSequence.test.ts
+- 12 tests: modal export, context exports, SavedSequence shape, total duration computation, unique id generation, name trim validation, library page export, formatTotalDuration (6 cases), computed vs stored totalDuration, seed pose id integrity
+- **Learnings:** The SavedSequence interface already existed with seed data in AppContext. Adding optional fields (styleId, totalDuration) is non-breaking for existing seeds. Modal overlay pattern (fixed inset backdrop + centered card + stopPropagation) works well for design system modals.
+---
+
+## 2026-04-26 - US-009: Pose detail modal with illustration, video area, accordions, and chakras
+- Created PoseDetailModal slide-over component (src/components/PoseDetailModal.tsx): slides up from bottom with style-colored header block
+- Pose name displayed in display-md, Sanskrit name in body/ink-3 italic
+- Placeholder video area: gray box (card-2 bg) with SVG play icon circle
+- Precautions expandable/collapsible section: renders bullet list from pose.precautions, fallback text when empty
+- How to Practice expandable/collapsible section: renders pose.detailed_instructions as paragraph
+- 7 chakra circles: all chakras rendered, active ones highlighted with their color, inactive shown as faded card-2
+- Close X button on top-right of modal dismisses it
+- Wired into builder: added info (i) button on each PoseCard, clicking opens PoseDetailModal for that pose
+- PoseCard refactored from single button to div with nested toggle button + info button for separate actions
+- Files changed: src/components/PoseDetailModal.tsx (new), src/components/__tests__/PoseDetailModal.test.ts (new), src/app/(app)/builder/page.tsx (modified)
+- 14 tests: module export, detailed_instructions field check, precautions array check, chakra id validation, style_id validation, 7 chakras count, chakra fields, chakra order, style hex colors, style lookup mapping, accordion toggle logic (2), independent accordion state, non-empty precautions check
+- **Learnings:** AccordionSection pattern (button with toggle + conditional children) is reusable. For cards that need both selection and detail actions, split into a wrapper div with separate buttons rather than nesting buttons. The slide-over modal pattern (alignItems: flex-end + bottom border-radius) works well for detail views.
+---
+
+## 2026-04-26 - US-010: Sequence Player with countdown, timer, transport controls, and auto-advance
+- Created (fullscreen) route group with AppProvider but no BottomNav for full-screen views
+- Created /player route at src/app/(fullscreen)/player/page.tsx
+- 3-2-1 countdown displays before each pose in display-xl typography
+- Current pose card with style color placeholder, name, Sanskrit name; countdown timer in MM:SS mono font; next pose preview
+- Transport controls: skip back, pause/play (filled), skip forward icon buttons at 44x44px
+- Pause stops the timer, play resumes; skip forward/back navigate poses
+- Progress bar at top shows current position as percentage
+- Auto-advance when timer reaches zero transitions to next pose countdown
+- After last pose completes, records session to practiceHistory in context and navigates to /complete
+- Close X exits to review screen (/builder/review)
+- Empty state redirects to builder when no poses selected
+- Exported pure helper functions (formatTimer, getProgressPercent, createInitialState, tickCountdown, tickPoseTimer, skipForward, skipBack, togglePause) for testability
+- Files changed: src/app/(fullscreen)/layout.tsx (new), src/app/(fullscreen)/player/page.tsx (new), src/components/__tests__/Player.test.ts (new)
+- 27 tests: formatTimer (5 cases), getProgressPercent (4 cases), createInitialState, tickCountdown (4 cases), tickPoseTimer (4 cases), skipForward (2 cases), skipBack (2 cases), togglePause (2 cases), DEFAULT_DURATION check
+- **Learnings:** Full-screen views (player, onboarding, complete) need a separate route group like (fullscreen) with AppProvider but no BottomNav. Pure state transition functions make timer logic easy to test without DOM rendering. The setInterval + useEffect pattern with cleanup on unmount handles timer lifecycle cleanly.
+---
+
+## 2026-04-26 - US-011: Workout Complete screen with stats, streak, and action buttons
+- Created /complete route at src/app/(fullscreen)/complete/page.tsx in the fullscreen route group (no BottomNav)
+- Large checkmark icon in blush circle at display-xl scale
+- 'Practice Complete' heading in display-lg with subtitle
+- Stats summary section on bg-2 background: total duration (MM:SS mono), pose count, style name
+- Streak indicator calculated from practiceHistory dates: consecutive day count with dot visualization
+- 'Save to Library' split-pill appears only if current sequence is not already saved
+- 'Practice Again' ghost button navigates to /player to replay
+- 'Back to Home' ghost button navigates to /home
+- Exported pure helper functions (formatDuration, calculateStreak) for testability
+- Files changed: src/app/(fullscreen)/complete/page.tsx (new), src/components/__tests__/Complete.test.ts (new)
+- 18 tests: module exports, formatDuration (5 cases), calculateStreak (8 cases: empty, today, consecutive, duplicates, gap, stale, yesterday start, unordered), data integrity (styles, practice sessions, SplitPill, GhostButton exports)
+- **Learnings:** Streak calculation needs to handle: deduplication of dates, yesterday as valid start, unordered input. The complete page reads the most recent practiceHistory entry (just recorded by player) for session stats.
+---
+
+## 2026-04-26 - US-012: Library screen with saved sequences, search, and empty state
+- Upgraded existing library page from US-008 with full US-012 acceptance criteria
+- 'Your Library' heading in display-lg typography
+- Search input filters saved sequences by name (case-insensitive, client-side)
+- Sequence cards show: pose-color thumbnail strip (one colored segment per pose), name, duration pill (tag-bg bg, mono font), pose count
+- Clicking a sequence loads its poses into selectedPoses context and navigates to /builder/review
+- Empty state: 'No sequences yet. Build your first flow.' with split-pill CTA to /builder
+- Search no-results state shows the query text
+- Pre-seeded with 2 example sequences (Morning Sun Flow, Evening Wind Down) from AppContext SEED_SEQUENCES
+- Exported pure helpers: formatTotalDuration, filterSequencesByName for testability
+- Files changed: src/app/(app)/library/page.tsx, src/components/__tests__/Library.test.ts (new)
+- 16 tests: module exports (3), formatTotalDuration (4 cases), filterSequencesByName (6 cases: empty, whitespace, partial, case-insensitive, no match, middle match), seed data integrity (3: context exports, valid pose ids, style color mapping)
+- **Learnings:** Loading a saved sequence into review = set selectedPoses in context from poseIds lookup, then navigate. The thumbnail strip pattern (flex row of colored divs with flex:1) creates an effective visual fingerprint for sequences.
+---
+
+## 2026-04-26 - US-013: Pre-made flow detail page with teacher, description, and pose grid
+- Created /flow/[id] dynamic route at src/app/(app)/flow/[id]/page.tsx
+- Placeholder header image area (220px) with style color, rounded bottom corners
+- Style pill badge overlaid on header area
+- Back button (icon-btn) and bookmark icon-btn (heart toggle) in header
+- Flow name in display-md, duration pill and difficulty pill in tag-bg
+- Teacher section: placeholder avatar circle (initial letter) + teacher_name in body-lg
+- Description paragraph in body-lg with ink-2 color
+- 3-column pose grid (same layout pattern as review screen) with per-pose +/- duration controls
+- Start split-pill in fixed bottom bar loads poses into context (setSelectedPoses) and navigates to /player
+- Total duration shown in bottom bar with clock icon
+- Not-found state when flow id is invalid
+- Exported pure helpers: formatDuration, resolveFlowPoses for testability
+- Files changed: src/app/(app)/flow/[id]/page.tsx (new), src/components/__tests__/FlowDetail.test.ts (new)
+- 21 tests: module exports, formatDuration (5 cases), resolveFlowPoses (4 cases: valid ids, invalid ids, empty, order preservation), premade flow data integrity (8 cases: valid style_ids, valid pose_ids, teacher names, descriptions, difficulty, duration, unique ids, full resolution), duration constants (3 cases)
+- **Learnings:** resolveFlowPoses pattern (Map lookup from pose array, filter Boolean) is reusable for any pose_ids array resolution. The flow detail page reuses the same pose card layout as review but without edit mode.
+---
+
+## 2026-04-26 - US-014: Explore screen with pre-made flows by category and by style
+- Replaced stub explore page with full Explore screen at src/app/(app)/explore/page.tsx
+- 'Explore' heading in display-lg typography
+- Pre-Made Sequences section: horizontal scroll of 5 explore categories (Energy Boost, Emotional Release, Posture, Detoxing, Intuition) with placeholder illustration, name, practice count pill
+- Clicking a category card toggles a filtered list of pre-made flows below the carousel
+- FlowListCard shows style color swatch, flow name, duration + difficulty pills, arrow link to /flow/[id]
+- By Style section: horizontal scroll of 7 style cards with style color header, name, practice count in mono
+- Carousel counters (mono fraction + icon buttons) on both sections via CarouselCounter component
+- Exported pure helpers: getFlowsForCategory, getFlowCountForStyle, exploreCategories for testability
+- ExploreCategory interface maps category names to flowIds for flexible flow-to-category assignment
+- Files changed: src/app/(app)/explore/page.tsx (modified), src/components/__tests__/Explore.test.ts (new)
+- 20 tests: module exports, 5 category names, unique ids, flowId validity, getFlowsForCategory (3 cases: matching, unknown, order preservation), getFlowCountForStyle (4 cases: with flows, no flows, unknown, all styles), data integrity (4 cases)
+- **Learnings:** Explore categories are distinct from pose categories - they group premade flows, not poses. The ExploreCategory type with flowIds array allows flexible many-to-many mapping without modifying PremadeFlow. App source imports use bare paths (no .ts extension), only test imports use explicit extensions.
+---
+
+## 2026-04-26 - US-015: Profile screen with avatar, settings, and version info
+- Replaced stub profile page with full Profile screen at src/app/(app)/profile/page.tsx
+- Placeholder avatar circle (88px, bg-2 background) with UserIcon SVG component
+- Name 'Kaira User' in display-sm and email 'hello@kaira.app' in small/ink-3
+- Settings section with eyebrow label: Play pose name toggle (ToggleSwitch component), Practice Stats link to /progress, Customer Center row, Log Out row
+- ToggleSwitch: 48x28px toggle with ink/rule background states, animated knob, role="switch" + aria-checked
+- Exported pure togglePoseName helper for testability
+- Version 'v1.0.0' in mono/ink-3 at bottom center
+- Files changed: src/app/(app)/profile/page.tsx, src/components/__tests__/Profile.test.ts (new)
+- 13 tests: module exports (4), togglePoseName (3 cases: false->true, true->false, idempotent), profile data (3: name, email, version), RegistrationMark import, settings rows (2: labels, link href)
+- **Learnings:** ToggleSwitch with role="switch" + aria-checked is the accessible pattern for toggle settings. SettingsRow is a simple flex row pattern reusable for settings lists.
+---
+
+## 2026-04-26 - US-016: Progress and stats screen with stat cards, calendar heatmap, recent sessions
+- Created /progress route at src/app/(app)/progress/page.tsx
+- 'Your Practice' heading in display-lg typography
+- 4 stat cards in 2x2 grid: Total Sessions, Total Minutes, Current Streak, Poses Practiced. Each uses mono eyebrow label and display-md number value
+- Calendar heatmap: current month grid with weekday headers (S-S), filled dots (--ink) for practiced days, empty dots (--rule) for non-practiced
+- Recent Sessions list: last 5 sessions sorted by date, each showing sequence name, duration, date, and style pill (tag-bg mono)
+- Clicking a session loads poses by style into context and navigates to /builder/review
+- Seeded practiceHistory in AppContext with fixture data from practice-history.ts (was previously empty [])
+- Exported pure helpers: computeStats, calculateStreak, getCalendarDays, formatSessionDuration, formatSessionDate
+- Files changed: src/app/(app)/progress/page.tsx (new), src/components/__tests__/Progress.test.ts (new), src/context/AppContext.tsx (seeded practiceHistory)
+- 28 tests: module exports (6), computeStats (4 cases: empty, totalSessions, totalMinutes rounding, posesPracticed), calculateStreak (6 cases: empty, today, consecutive, duplicates, stale, yesterday start), getCalendarDays (4 cases: April days, null padding, first day, Feb non-leap), formatSessionDuration (4 cases), formatSessionDate (1 case), data integrity (3 cases)
+- **Learnings:** practiceHistory in AppContext needed seeding with fixture data for the progress screen to be useful on first load (was [] before). The getCalendarDays helper using firstDay offset + daysInMonth is a clean pattern for month grid rendering.
+---
+
+## 2026-04-26 - US-017: Pose encyclopedia with browse, style filter, and search
+- Created /poses route at src/app/(app)/poses/page.tsx
+- 'Pose Library' heading in display-lg typography
+- Total pose count displayed in mono text below heading (dynamic, reflects filtered count)
+- Search input filters by pose name or Sanskrit name (case-insensitive)
+- Style filter pills: All + 7 yoga styles using Pill component, active state toggles
+- Responsive grid (auto-fill, minmax 200px) of pose cards: placeholder color block with pose number, name, Sanskrit name (italic), style pill (tag-bg), chakra dots (colored circles)
+- Clicking any card opens PoseDetailModal (reused from US-009)
+- Empty state when no poses match filters
+- Exported pure helpers: filterPoses, getStyleColor, getStyleName for testability
+- Files changed: src/app/(app)/poses/page.tsx (new), src/components/__tests__/PoseEncyclopedia.test.ts (new)
+- 22 tests: module exports (6), filterPoses (8 cases: all, by style, by name, by Sanskrit, combined, no match, whitespace, case-insensitive), getStyleColor (2 cases), getStyleName (2 cases), style pills count, unique ids, data integrity (3: valid style_ids, valid chakras, name fields), pose count, per-style coverage
+- **Learnings:** The filterPoses helper pattern (chain of filter operations with early returns for "all"/"empty") is clean and testable. Responsive grid with auto-fill + minmax handles 3-4 columns naturally without media queries.
+---
+
+## 2026-04-26 - US-018: Onboarding flow steps 1-7 (Welcome through Preferences)
+- Created fullscreen onboarding page at src/app/(fullscreen)/onboarding/page.tsx
+- Step 1 (Welcome): placeholder hero with sun icon, display-lg heading, Get Started split-pill
+- Step 2 (Goal): 4 selectable goal cards from onboarding data, single-select with check icon
+- Step 3 (Pain Points): 4 pain point cards, multi-select with toggle checkmarks
+- Step 4 (Social Proof): Testimonial card matched to selected goal using testimonialsByGoal, blush bg variant
+- Step 5 (Tinder Cards): Swipeable statement cards with left/right click buttons + touch swipe, Content Ease animation
+- Step 6 (Personalized Solution): Pain points mapped to features with strikethrough/bold pattern, counter stats
+- Step 7 (Preferences): Style pills from styles data (1-3 multi-select) and session length single-select pills
+- Progress indicator: dots + mono counter (e.g. 04/07) updating per step
+- Back arrow on steps 2+, Skip link on every step, Continue/Finish split-pill on steps 2+
+- Slide-left transitions between steps using 520ms Content Ease curve
+- Selections stored in onboardingData in AppContext via useEffect sync
+- Used existing OnboardingData type (completed, selectedGoal, selectedPainPoints, tinderResults, preferences Record)
+- 24 tests: step title mapping, pain-to-feature mapping logic, data fixture validation
+- Files changed: src/app/(fullscreen)/onboarding/page.tsx, src/components/__tests__/Onboarding.test.ts
+- **Learnings:** .ts extensions in imports are only needed in test files for node:test ESM resolution, NOT in app source files (Next.js handles that via its own resolution). The fullscreen route group pattern continues to work well for full-page experiences without BottomNav.
+---
+
+## 2026-04-26 - US-019: Onboarding steps 8-11 (Processing, Mini-Builder Demo, Value Delivery, Account Gate)
+- Extended onboarding from 7 steps to 11 steps with progress dots spanning all 11
+- Step 8 (Processing): animated progress bar with sequential messages based on user's style/goal preferences, auto-advances after 3 seconds
+- Step 9 (App Demo): mini builder showing 6 poses from preferred style, user selects 3-4, shows "You just built your first flow" confirmation with selection strip
+- Step 10 (Value Delivery): 3-column review grid of built sequence with per-pose durations, Play Now split-pill navigates to player, Save & Continue saves to library and advances
+- Step 11 (Account Gate): email input + Create Account button (non-functional) + Skip for now link
+- Updated home page to order styles by onboarding preferences (preferred styles first) via orderStylesByPreference helper
+- Bottom CTA logic updated: steps 2-7 show Continue, step 8 auto-advances, step 9 shows Continue when enough poses selected, step 10 has own CTAs, step 11 shows Finish
+- Files changed: src/app/(fullscreen)/onboarding/page.tsx, src/app/(app)/home/page.tsx, src/components/__tests__/Onboarding.test.ts, src/components/__tests__/OnboardingSteps8_11.test.ts (new)
+- 26 new tests: getStepTitle (6 for steps 8-11), getMiniBuilderPoses (5 cases), formatDuration (4 cases), processing messages (3 cases), orderStylesByPreference (3 cases), mini-builder data integrity (1 case), old test fix (step 8 range)
+- **Learnings:** Auto-advancing steps (like processing) use useEffect with setTimeout on step state. The mini-builder reuses pose card patterns from the main builder but simplified. Home page style ordering is a clean sort: preferred first, then rest in original order.
+---
