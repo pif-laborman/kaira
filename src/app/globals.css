@@ -54,6 +54,10 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
+  /* Overlay */
+  --overlay: rgba(20, 19, 15, 0.45);
+  --overlay-light: rgba(255, 255, 255, 0.8);
+
   /* Motion */
   --ease-snap: cubic-bezier(.65, 0, .35, 1);
   --ease-content: cubic-bezier(.22, 1, .36, 1);

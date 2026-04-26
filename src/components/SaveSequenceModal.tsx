@@ -16,7 +16,7 @@ export function SaveSequenceModal({
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(20, 19, 15, 0.5)",
+        background: "var(--overlay)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

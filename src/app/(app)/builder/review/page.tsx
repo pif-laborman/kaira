@@ -216,8 +216,7 @@ function ReviewCard({
       {/* Content */}
       <div style={{ padding: "12px 14px" }}>
         <p
-          className="display-sm"
-          style={{ fontSize: 15, marginBottom: 8, color: "var(--ink)" }}
+          className="display-sm" style={{ marginBottom: 8, color: "var(--ink)" }}
         >
           {pose.name}
         </p>
@@ -295,7 +294,7 @@ function OverflowMenu({
             right: 0,
             background: "var(--card)",
             border: "1px solid var(--rule)",
-            borderRadius: 12,
+            borderRadius: 8,
             padding: "4px 0",
             minWidth: 180,
             boxShadow: "0 8px 24px rgba(20,19,15,0.12)",
@@ -514,7 +513,7 @@ export default function ReviewPage() {
           <ReviewCard
             key={`${pose.id}-${idx}`}
             pose={pose}
-            styleColor={styleColorMap[pose.style_id] ?? "#ccc"}
+            styleColor={styleColorMap[pose.style_id] ?? "var(--rule)"}
             duration={getDuration(pose.id)}
             onIncrease={() => increaseDuration(pose.id)}
             onDecrease={() => decreaseDuration(pose.id)}

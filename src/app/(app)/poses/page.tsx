@@ -29,7 +29,7 @@ export function filterPoses(
 }
 
 export function getStyleColor(styleId: string): string {
-  return styles.find((s) => s.id === styleId)?.color ?? "#C9B99A";
+  return styles.find((s) => s.id === styleId)?.color ?? "var(--blush-2)";
 }
 
 export function getStyleName(styleId: string): string {
@@ -68,7 +68,7 @@ export default function PosesPage() {
           style={{
             width: "100%",
             padding: "12px 16px",
-            borderRadius: 12,
+            borderRadius: 8,
             border: "1px solid var(--rule)",
             background: "var(--bg)",
             fontFamily: "inherit",
@@ -140,7 +140,7 @@ export default function PosesPage() {
                   textAlign: "left",
                   fontFamily: "inherit",
                   overflow: "hidden",
-                  transition: "border-color 0.2s ease",
+                  transition: "border-color 200ms ease",
                 }}
               >
                 {/* Color block placeholder */}

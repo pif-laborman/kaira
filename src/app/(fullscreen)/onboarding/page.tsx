@@ -745,7 +745,7 @@ function StepMiniBuilder({
             const pose = miniPoses.find((p) => p.id === id);
             if (!pose) return null;
             const styleColor =
-              styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+              styles.find((s) => s.id === pose.style_id)?.color || "var(--rule)";
             return (
               <button
                 key={id}
@@ -754,7 +754,7 @@ function StepMiniBuilder({
                 style={{
                   width: 48,
                   height: 48,
-                  borderRadius: 12,
+                  borderRadius: 8,
                   background: styleColor,
                   border: "2px solid var(--ink)",
                   cursor: "pointer",
@@ -765,7 +765,7 @@ function StepMiniBuilder({
                   fontFamily: "inherit",
                 }}
               >
-                <span className="mono" style={{ fontSize: 10, color: "#fff" }}>
+                <span className="mono" style={{ fontSize: 10, color: "var(--pill-ink)" }}>
                   {pose.number}
                 </span>
               </button>
@@ -785,7 +785,7 @@ function StepMiniBuilder({
         {miniPoses.map((pose) => {
           const isSelected = selectedPoseIds.includes(pose.id);
           const styleColor =
-            styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+            styles.find((s) => s.id === pose.style_id)?.color || "var(--rule)";
           return (
             <button
               key={pose.id}
@@ -818,7 +818,7 @@ function StepMiniBuilder({
               >
                 <span
                   className="mono"
-                  style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}
+                  style={{ color: "var(--pill-ink)", fontSize: 14, fontWeight: 700 }}
                 >
                   {String(pose.number).padStart(2, "0")}
                 </span>
@@ -913,12 +913,12 @@ function StepValueDelivery({
       >
         {selectedPoses.map((pose, i) => {
           const styleColor =
-            styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+            styles.find((s) => s.id === pose.style_id)?.color || "var(--rule)";
           return (
             <div
               key={`${pose.id}-${i}`}
               style={{
-                borderRadius: 14,
+                borderRadius: 18,
                 border: "1px solid var(--rule)",
                 overflow: "hidden",
                 background: "var(--card)",
@@ -936,7 +936,7 @@ function StepValueDelivery({
               >
                 <span
                   className="mono"
-                  style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}
+                  style={{ color: "var(--pill-ink)", fontSize: 12, fontWeight: 700 }}
                 >
                   {String(pose.number).padStart(2, "0")}
                 </span>
@@ -1019,7 +1019,7 @@ function StepAccountGate({ onSkip }: { onSkip: () => void }) {
           style={{
             width: "100%",
             padding: "16px 20px",
-            borderRadius: 14,
+            borderRadius: 18,
             border: "1px solid var(--rule)",
             background: "var(--card)",
             fontSize: 16,
@@ -1036,7 +1036,7 @@ function StepAccountGate({ onSkip }: { onSkip: () => void }) {
           style={{
             width: "100%",
             padding: "16px 24px",
-            borderRadius: 14,
+            borderRadius: 18,
             border: "none",
             background: "var(--ink)",
             color: "var(--pill-ink)",

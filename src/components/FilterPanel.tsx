@@ -70,7 +70,7 @@ export function FilterPanel({
         position: "fixed",
         inset: 0,
         zIndex: 100,
-        background: "rgba(20,19,15,0.45)",
+        background: "var(--overlay)",
         display: "flex",
         justifyContent: "flex-end",
       }}

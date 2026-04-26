@@ -137,8 +137,7 @@ function FlowPoseCard({
       {/* Content */}
       <div style={{ padding: "12px 14px" }}>
         <p
-          className="display-sm"
-          style={{ fontSize: 15, marginBottom: 8, color: "var(--ink)" }}
+          className="display-sm" style={{ marginBottom: 8, color: "var(--ink)" }}
         >
           {pose.name}
         </p>
@@ -242,7 +241,7 @@ export default function FlowDetailPage() {
     );
   }
 
-  const styleColor = style?.color ?? "#ccc";
+  const styleColor = style?.color ?? "var(--rule)";
 
   return (
     <div className="page" style={{ paddingTop: 0, paddingBottom: 160 }}>
@@ -253,7 +252,7 @@ export default function FlowDetailPage() {
           background: styleColor,
           opacity: 0.3,
           position: "relative",
-          borderRadius: "0 0 24px 24px",
+          borderRadius: "0 0 18px 18px",
         }}
       />
 
@@ -286,7 +285,7 @@ export default function FlowDetailPage() {
               height: 44,
               borderRadius: 999,
               border: "1px solid var(--ink)",
-              background: "rgba(255,255,255,0.7)",
+              background: "var(--overlay-light)",
               cursor: "pointer",
               fontSize: 18,
               color: "var(--ink)",
@@ -308,7 +307,7 @@ export default function FlowDetailPage() {
               height: 44,
               borderRadius: 999,
               border: "1px solid var(--ink)",
-              background: bookmarked ? "var(--ink)" : "rgba(255,255,255,0.7)",
+              background: bookmarked ? "var(--ink)" : "var(--overlay-light)",
               cursor: "pointer",
               fontSize: 18,
               color: bookmarked ? "var(--pill-ink)" : "var(--ink)",
@@ -329,7 +328,7 @@ export default function FlowDetailPage() {
           <span
             style={{
               display: "inline-block",
-              background: "rgba(255,255,255,0.8)",
+              background: "var(--overlay-light)",
               borderRadius: 999,
               padding: "5px 14px",
               fontSize: 11,

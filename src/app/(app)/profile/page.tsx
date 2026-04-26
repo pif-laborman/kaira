@@ -37,12 +37,12 @@ export function ToggleSwitch({
       style={{
         width: 48,
         height: 28,
-        borderRadius: 14,
+        borderRadius: 18,
         border: "none",
         backgroundColor: checked ? "var(--ink)" : "var(--rule)",
         position: "relative",
         cursor: "pointer",
-        transition: "background-color 0.2s ease",
+        transition: "background-color 200ms ease",
         flexShrink: 0,
       }}
     >
@@ -55,7 +55,7 @@ export function ToggleSwitch({
           height: 22,
           borderRadius: "50%",
           backgroundColor: "var(--bg)",
-          transition: "left 0.2s ease",
+          transition: "left 200ms ease",
         }}
       />
     </button>

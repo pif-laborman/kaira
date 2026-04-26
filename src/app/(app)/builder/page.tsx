@@ -30,7 +30,7 @@ function StyleOverlay({
         position: "fixed",
         inset: 0,
         zIndex: 100,
-        background: "rgba(20,19,15,0.45)",
+        background: "var(--overlay)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -101,7 +101,7 @@ function StyleOverlay({
                 style={{
                   width: 48,
                   height: 48,
-                  borderRadius: 12,
+                  borderRadius: 8,
                   background: s.color,
                 }}
               />
@@ -204,7 +204,7 @@ function PoseCard({
           )}
         </div>
         <div style={{ padding: "12px 14px" }}>
-          <p className="display-sm" style={{ fontSize: 15, marginBottom: 2, color: "var(--ink)" }}>
+          <p className="display-sm" style={{ marginBottom: 2, color: "var(--ink)" }}>
             {pose.name}
           </p>
           <p className="small" style={{ color: "var(--ink-3)", marginBottom: 6, fontStyle: "italic" }}>
@@ -227,8 +227,8 @@ function PoseCard({
           position: "absolute",
           bottom: 10,
           right: 10,
-          width: 28,
-          height: 28,
+          width: 36,
+          height: 36,
           borderRadius: 999,
           border: "1px solid var(--rule)",
           background: "var(--bg)",
@@ -281,7 +281,7 @@ function SelectedStrip({
           style={{
             width: 44,
             height: 44,
-            borderRadius: 10,
+            borderRadius: 8,
             border: "1px solid var(--rule)",
             background: "var(--card-2)",
             cursor: "pointer",

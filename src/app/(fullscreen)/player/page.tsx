@@ -402,7 +402,7 @@ export default function PlayerPage() {
               <div
                 style={{
                   height: 200,
-                  background: styleColorMap[currentPose.style_id] ?? "#ccc",
+                  background: styleColorMap[currentPose.style_id] ?? "var(--rule)",
                   opacity: 0.35,
                   display: "flex",
                   alignItems: "center",

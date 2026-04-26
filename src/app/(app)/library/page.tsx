@@ -74,7 +74,7 @@ export default function LibraryPage() {
             width: "100%",
             height: 48,
             padding: "0 16px",
-            borderRadius: 12,
+            borderRadius: 8,
             border: "1px solid var(--rule)",
             background: "var(--card-2)",
             fontSize: 15,
@@ -142,7 +142,7 @@ export default function LibraryPage() {
                     display: "flex",
                     gap: 3,
                     height: 6,
-                    borderRadius: 3,
+                    borderRadius: 4,
                     overflow: "hidden",
                     width: "100%",
                   }}
@@ -158,7 +158,7 @@ export default function LibraryPage() {
                         style={{
                           flex: 1,
                           background: color,
-                          borderRadius: 3,
+                          borderRadius: 4,
                         }}
                       />
                     );

@@ -15,7 +15,7 @@ export function PoseDetailModal({ pose, onClose }: PoseDetailModalProps) {
   const [howToOpen, setHowToOpen] = useState(false);
 
   const style = styles.find((s) => s.id === pose.style_id);
-  const styleColor = style?.color ?? "#C9B99A";
+  const styleColor = style?.color ?? "var(--blush-2)";
 
   return (
     <div
@@ -23,7 +23,7 @@ export function PoseDetailModal({ pose, onClose }: PoseDetailModalProps) {
         position: "fixed",
         inset: 0,
         zIndex: 200,
-        background: "rgba(20,19,15,0.45)",
+        background: "var(--overlay)",
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "center",
@@ -78,7 +78,7 @@ export function PoseDetailModal({ pose, onClose }: PoseDetailModalProps) {
             height: 36,
             borderRadius: 999,
             border: "1px solid var(--rule)",
-            background: "rgba(255,255,255,0.85)",
+            background: "var(--overlay-light)",
             cursor: "pointer",
             fontSize: 16,
             color: "var(--ink-2)",
@@ -107,7 +107,7 @@ export function PoseDetailModal({ pose, onClose }: PoseDetailModalProps) {
             style={{
               height: 160,
               background: "var(--card-2)",
-              borderRadius: 12,
+              borderRadius: 8,
               border: "1px solid var(--rule)",
               display: "flex",
               alignItems: "center",
