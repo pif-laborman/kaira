@@ -290,3 +290,22 @@ Started: 2026-04-26
 - 22 tests: module exports (6), filterPoses (8 cases: all, by style, by name, by Sanskrit, combined, no match, whitespace, case-insensitive), getStyleColor (2 cases), getStyleName (2 cases), style pills count, unique ids, data integrity (3: valid style_ids, valid chakras, name fields), pose count, per-style coverage
 - **Learnings:** The filterPoses helper pattern (chain of filter operations with early returns for "all"/"empty") is clean and testable. Responsive grid with auto-fill + minmax handles 3-4 columns naturally without media queries.
 ---
+
+## 2026-04-26 - US-018: Onboarding flow steps 1-7 (Welcome through Preferences)
+- Created fullscreen onboarding page at src/app/(fullscreen)/onboarding/page.tsx
+- Step 1 (Welcome): placeholder hero with sun icon, display-lg heading, Get Started split-pill
+- Step 2 (Goal): 4 selectable goal cards from onboarding data, single-select with check icon
+- Step 3 (Pain Points): 4 pain point cards, multi-select with toggle checkmarks
+- Step 4 (Social Proof): Testimonial card matched to selected goal using testimonialsByGoal, blush bg variant
+- Step 5 (Tinder Cards): Swipeable statement cards with left/right click buttons + touch swipe, Content Ease animation
+- Step 6 (Personalized Solution): Pain points mapped to features with strikethrough/bold pattern, counter stats
+- Step 7 (Preferences): Style pills from styles data (1-3 multi-select) and session length single-select pills
+- Progress indicator: dots + mono counter (e.g. 04/07) updating per step
+- Back arrow on steps 2+, Skip link on every step, Continue/Finish split-pill on steps 2+
+- Slide-left transitions between steps using 520ms Content Ease curve
+- Selections stored in onboardingData in AppContext via useEffect sync
+- Used existing OnboardingData type (completed, selectedGoal, selectedPainPoints, tinderResults, preferences Record)
+- 24 tests: step title mapping, pain-to-feature mapping logic, data fixture validation
+- Files changed: src/app/(fullscreen)/onboarding/page.tsx, src/components/__tests__/Onboarding.test.ts
+- **Learnings:** .ts extensions in imports are only needed in test files for node:test ESM resolution, NOT in app source files (Next.js handles that via its own resolution). The fullscreen route group pattern continues to work well for full-page experiences without BottomNav.
+---
