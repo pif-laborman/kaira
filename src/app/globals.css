@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-cream: #F2EDE6;
-  --color-cream-dark: #E8E1D8;
-  --color-charcoal: #1C1C1C;
-  --color-warm-gray: #8A8478;
-  --color-warm-pink: #E8C4C0;
-  --color-warm-green: #C5D8C0;
-  --color-warm-yellow: #E8DFC0;
-  --color-warm-blue: #C0CED8;
-  --color-accent: #D4845A;
-  --color-accent-dark: #C07448;
-  --color-teal: #1A9E8F;
-  --color-success: #3D8B5E;
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Inter', sans-serif;
+  --color-bg: #ffffff;
+  --color-bg-2: #f5f2ec;
+  --color-card: #ffffff;
+  --color-card-2: #fafaf7;
+  --color-blush: #f4e9e3;
+  --color-blush-2: #e8d8cc;
+  --color-ink: #14130f;
+  --color-ink-2: #2a2926;
+  --color-ink-3: #6b6a64;
+  --color-rule: #e6e3dc;
+  --color-rule-2: #efece5;
+  --color-tag-bg: #f3f0ea;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 /* Design System Tokens (DESIGN.md) */
@@ -83,57 +84,48 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  color: #1C1C1C;
-  background: #F2EDE6;
+  font-family: var(--font-sans), 'Hanken Grotesk', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
   font-feature-settings: "cv01", "ss01";
 }
 
-/* Decorative cross */
-.cross {
-  position: relative;
-}
-.cross::before,
-.cross::after {
-  content: '';
+/* Registration mark (design system: 14px ink-3 cross at section corners) */
+.reg-mark {
   position: absolute;
-  background: rgba(0,0,0,0.12);
+  width: 14px;
+  height: 14px;
+  color: var(--ink-3);
+  opacity: 0.55;
+  pointer-events: none;
 }
-.cross::before {
+.reg-mark::before, .reg-mark::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+.reg-mark::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
   width: 1px;
-  height: 16px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
-.cross::after {
-  width: 16px;
+.reg-mark::after {
+  top: 50%;
+  left: 0;
+  right: 0;
   height: 1px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%);
 }
 
-.cross-light::before,
-.cross-light::after {
-  background: rgba(255,255,255,0.2);
-}
-
-/* Button press */
-.btn-press {
-  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1), background-color 200ms ease;
-}
-.btn-press:active {
-  transform: scale(0.97);
-}
-
-/* Stagger animation */
+/* Content entrance (design system: Content Ease curve) */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .fade-up {
-  animation: fadeUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation: fadeUp var(--dur-content) var(--ease-content) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
