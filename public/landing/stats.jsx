@@ -1,9 +1,9 @@
-// Stats — three giant numbers, editorial spread, lots of air
+// Stats — three giant numbers, editorial spread
 function Stats() {
   const stats = [
-    { n: '10,000+', label: 'Poses indexed', sub: 'Across six styles, with alignment cues for each.' },
-    { n: '240',     label: 'Pre-made sequences', sub: 'From five-minute resets to ninety-minute deep work.' },
-    { n: '6',       label: 'Practice styles', sub: 'Hatha · Yin · Restorative · Chair · Kundalini · Meditation.' },
+    { n: '7', label: 'Practice styles', sub: 'Hatha Vinyasa, Yin, Restorative, Chair, Kundalini, Pranayama, Meditation.' },
+    { n: '100+', label: 'Poses in the library', sub: 'Each with alignment cues, Sanskrit names, and video guidance.' },
+    { n: '<5', label: 'Minutes to build a flow', sub: 'Filter by style, chakra, or benefit. Smart suggestions handle the rest.' },
   ];
   return (
     <section id="stats" className="frame">
@@ -14,9 +14,9 @@ function Stats() {
           display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 24,
           alignItems: 'flex-start', paddingBottom: 'clamp(40px, 5vw, 80px)',
         }}>
-          <div className="eyebrow">— By the Numbers</div>
+          <div className="eyebrow">— By the numbers</div>
           <div className="mono" style={{ color: 'var(--ink-3)', textAlign: 'right', textTransform: 'uppercase' }}>
-            Index 03 / Quantities
+            What you get
           </div>
         </div>
         <div className="stats-row" style={{
@@ -39,7 +39,7 @@ function Stats() {
                 fontFamily: "'Hanken Grotesk', sans-serif",
                 fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
               }}>{s.label}</div>
-              <p className="small" style={{ margin: '8px 0 0 0', color: 'var(--ink-3)', maxWidth: 240 }}>
+              <p className="small" style={{ margin: '8px 0 0 0', color: 'var(--ink-3)', maxWidth: 280 }}>
                 {s.sub}
               </p>
             </div>

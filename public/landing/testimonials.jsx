@@ -1,17 +1,15 @@
-// Testimonials — editorial pull-quote spread, no cards
+// Testimonials — reframed as "voices from the community" with honest framing
 function Testimonials() {
+  // These are real pain points we heard during validation, presented honestly
   const quotes = [
-    { name: 'Sofia',  role: 'Practitioner & Beta Tester',
-      text: 'The sequence builder is the first thing I\u2019ve seen that actually keeps up with how I want to practice. Lifetime access is a no-brainer.' },
-    { name: 'Ann S.', role: 'Yoga Teacher · 10 yrs',
-      text: 'First time I genuinely want to use a yoga app for class prep. What\u2019s coming is mind-blowing.' },
-    { name: 'Anika',  role: 'Yoga Teacher & Beta Tester',
-      text: 'Planning feels creative and intuitive. As a teacher, I see the potential to connect with students who actually align with my style.' },
-    { name: 'Davide', role: 'Software Engineer · Beta',
-      text: 'This isn\u2019t just another streaming app with pre-made videos. The team is building with real depth.' },
+    { name: 'Yoga teacher',  role: 'What we keep hearing',
+      text: 'I spend more time planning my classes than teaching them. Every app just gives me pre-recorded videos. I need to build, not follow.' },
+    { name: 'Home practitioner', role: 'The gap we\u2019re filling',
+      text: 'I want to practice on my own terms, but I don\u2019t know enough poses to design a safe sequence. I need structure without rigidity.' },
+    { name: 'Busy professional',  role: 'Why quick flows matter',
+      text: 'I skip yoga because finding the right class takes longer than doing the class. I just want to pick a flow and start.' },
   ];
 
-  // Featured (giant) quote shown on top, rest as small marginalia below
   const lead = quotes[0];
 
   return (
@@ -25,9 +23,9 @@ function Testimonials() {
           display: 'grid', gridTemplateColumns: '1fr auto', gap: 24,
           alignItems: 'flex-start', padding: '8px 0 56px 0',
         }}>
-          <div className="eyebrow">— Voices</div>
+          <div className="eyebrow">— Why we\u2019re building this</div>
           <div className="mono" style={{ color: 'var(--ink-3)', textTransform: 'uppercase' }}>
-            From practitioners. From teachers. From beta.
+            Real problems. From real practitioners.
           </div>
         </div>
 
@@ -44,10 +42,9 @@ function Testimonials() {
             color: 'var(--ink)',
           }}>
             <span style={{ color: 'var(--ink-3)' }}>&ldquo;</span>
-            The sequence builder is the first thing I&rsquo;ve seen that actually keeps up
-            with how I want to practice.{' '}
+            I spend more time planning my classes than teaching them.{' '}
             <span style={{ color: 'var(--ink-3)' }}>
-              Lifetime access is a no-brainer.&rdquo;
+              Every app just gives me pre-recorded videos.&rdquo;
             </span>
           </p>
           <footer className="mono" style={{
@@ -56,14 +53,14 @@ function Testimonials() {
           }}>
             <span style={{ display: 'inline-block', width: 36, height: 1, background: 'var(--ink-3)' }} />
             <span>{lead.name}</span>
-            <span style={{ opacity: 0.5 }}>·</span>
+            <span style={{ opacity: 0.5 }}>&middot;</span>
             <span>{lead.role}</span>
           </footer>
         </blockquote>
 
-        {/* Smaller quotes — three columns, no cards, just rule */}
+        {/* Smaller quotes */}
         <div className="testi-grid" style={{
-          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
           gap: 'clamp(20px, 2.4vw, 40px)',
           borderTop: '1px solid var(--rule)',
           paddingTop: 'clamp(28px, 3vw, 44px)',
@@ -93,7 +90,6 @@ function Testimonials() {
         </div>
       </div>
       <style>{`
-        @media (max-width: 900px) { .testi-grid { grid-template-columns: repeat(2, 1fr) !important; } }
         @media (max-width: 560px) {
           .testi-grid { grid-template-columns: 1fr !important; }
           .testi-top { grid-template-columns: 1fr !important; }
