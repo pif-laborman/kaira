@@ -123,3 +123,17 @@ Started: 2026-04-26
 - 17 tests: module export, has_sides field check, poses with sides exist, default_duration_seconds field, style-color mapping, MM:SS formatting (5 cases), duration controls logic (5 cases), total duration formatting (3 cases)
 - **Learnings:** The review page reads selectedPoses from AppContext set during the builder step. Duration state is local to the review page using a Record<string, number> keyed by pose id. The formatDuration helper uses padStart for consistent MM:SS display.
 ---
+
+## 2026-04-26 - US-007: Sequence edit mode with multi-select, remove, duplicate, side toggle
+- Added Edit button (GhostButton) to review screen top bar, enters edit mode
+- Edit mode shows checkboxes on each pose card for multi-select, selected cards get 2px solid --ink border
+- Bottom bar switches to Remove, Duplicate, Done buttons in edit mode
+- Side badge on has_sides poses is toggleable in edit mode: cycles L+R -> Right Side -> Left Side -> L+R
+- Remove deletes selected poses from AppContext and cleans up duration state
+- Duplicate inserts copies of selected poses immediately after their originals
+- Done exits edit mode, clears selection
+- Exported pure helper functions (removePoses, duplicatePoses, toggleSideLabel) for testability
+- Files changed: src/app/(app)/builder/review/page.tsx, src/components/__tests__/Review.test.ts
+- 12 new tests: module exports check, removePoses (3 cases), duplicatePoses (3 cases), toggleSideLabel (4 cases), duration recalculation after remove/duplicate (2 cases)
+- **Learnings:** Exporting pure functions from page components makes unit testing edit operations straightforward without needing DOM rendering. The key pattern for duplicate-in-place is iterating the array and pushing the original + copy when selected.
+---
