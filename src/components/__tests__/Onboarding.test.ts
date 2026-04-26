@@ -51,7 +51,7 @@ describe("US-018: Onboarding flow steps 1-7", () => {
 
     it("returns empty string for out-of-range step", () => {
       assert.equal(getStepTitle(0), "");
-      assert.equal(getStepTitle(8), "");
+      assert.equal(getStepTitle(12), "");
     });
   });
 

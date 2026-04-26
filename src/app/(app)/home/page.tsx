@@ -4,7 +4,21 @@ import { useRef, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { RegistrationMark } from "@/components/RegistrationMark";
 import { CarouselCounter } from "@/components/CarouselCounter";
+import { useAppContext } from "@/context/AppContext";
 import { styles, premadeFlows, categories, poses } from "@/data";
+
+// Exported for testing - reorder styles by preference
+export function orderStylesByPreference(
+  allStyles: typeof styles,
+  preferredIds: string[]
+): typeof styles {
+  if (preferredIds.length === 0) return allStyles;
+  const preferred = preferredIds
+    .map((id) => allStyles.find((s) => s.id === id))
+    .filter(Boolean) as typeof styles;
+  const rest = allStyles.filter((s) => !preferredIds.includes(s.id));
+  return [...preferred, ...rest];
+}
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -222,7 +236,18 @@ function ScrollSection({
 
 /* --- Home Page --- */
 export default function HomePage() {
+  const { onboardingData } = useAppContext();
   const dailyFlows = premadeFlows.slice(0, 4);
+
+  const preferredStyleIds = useMemo(() => {
+    const prefs = onboardingData.preferences.stylePreferences;
+    return prefs ? prefs.split(",").filter(Boolean) : [];
+  }, [onboardingData.preferences.stylePreferences]);
+
+  const orderedStyles = useMemo(
+    () => orderStylesByPreference(styles, preferredStyleIds),
+    [preferredStyleIds]
+  );
 
   const categoryPoseCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -243,8 +268,8 @@ export default function HomePage() {
       </div>
 
       {/* Pick a Yoga Style */}
-      <ScrollSection eyebrow="Styles" title="Pick a Yoga Style" itemCount={styles.length}>
-        {styles.map((s) => (
+      <ScrollSection eyebrow="Styles" title="Pick a Yoga Style" itemCount={orderedStyles.length}>
+        {orderedStyles.map((s) => (
           <StyleCard key={s.id} style={s} />
         ))}
       </ScrollSection>

@@ -4,18 +4,23 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { SplitPill } from "@/components/SplitPill";
+import { GhostButton } from "@/components/GhostButton";
 import { Pill } from "@/components/Pill";
 import {
   goalOptions,
   painPoints,
   tinderStatements,
   testimonialsByGoal,
+  processingMessages,
 } from "@/data/onboarding";
 import { styles } from "@/data/styles";
+import { poses } from "@/data/poses";
 
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 11;
 const CONTENT_EASE = "cubic-bezier(.22,1,.36,1)";
 const SLIDE_DURATION = 520;
+const MINI_BUILDER_POSE_COUNT = 6;
+const MINI_BUILDER_MIN_SELECT = 3;
 
 // Exported for testing
 export function getStepTitle(step: number): string {
@@ -27,8 +32,29 @@ export function getStepTitle(step: number): string {
     case 5: return "Tinder Cards";
     case 6: return "Personalized Solution";
     case 7: return "Preferences";
+    case 8: return "Processing";
+    case 9: return "App Demo";
+    case 10: return "Value Delivery";
+    case 11: return "Account Gate";
     default: return "";
   }
+}
+
+// Exported for testing - get poses for mini builder based on preferred style
+export function getMiniBuilderPoses(
+  stylePrefs: string[],
+  count: number = MINI_BUILDER_POSE_COUNT
+) {
+  const preferredStyle = stylePrefs[0] || "hatha-vinyasa";
+  const stylePoses = poses.filter((p) => p.style_id === preferredStyle);
+  return stylePoses.slice(0, count);
+}
+
+// Exported for testing - format duration as MM:SS
+export function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 // Exported for testing - maps pain points to features
@@ -578,6 +604,473 @@ function StepPreferences({
   );
 }
 
+// --- Step 8: Processing ---
+
+function StepProcessing({
+  stylePrefs,
+  goalId,
+}: {
+  stylePrefs: string[];
+  goalId: string | null;
+}) {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const styleName =
+    styles.find((s) => s.id === (stylePrefs[0] || "hatha-vinyasa"))?.name ||
+    "your";
+  const goalLabel =
+    goalOptions.find((g) => g.id === goalId)?.label || "your goals";
+
+  const messages = [
+    `Finding ${styleName} poses...`,
+    `Curating flows for ${goalLabel}...`,
+    "Personalizing your home screen...",
+  ];
+
+  useEffect(() => {
+    const totalDuration = processingMessages.reduce(
+      (sum, m) => sum + m.delay_ms,
+      0
+    );
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => Math.min(prev + 2, 100));
+    }, totalDuration / 50);
+
+    let elapsed = 0;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    for (let i = 1; i < messages.length; i++) {
+      elapsed += processingMessages[i - 1]?.delay_ms || 800;
+      timers.push(setTimeout(() => setMessageIndex(i), elapsed));
+    }
+
+    return () => {
+      clearInterval(progressInterval);
+      timers.forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div style={{ padding: "60px 24px", textAlign: "center" }}>
+      <h2
+        className="display-md"
+        style={{ color: "var(--ink)", marginBottom: 32 }}
+      >
+        Building your practice...
+      </h2>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 300,
+          height: 6,
+          borderRadius: 3,
+          background: "var(--rule)",
+          margin: "0 auto 32px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${progress}%`,
+            background: "var(--ink)",
+            borderRadius: 3,
+            transition: "width 60ms linear",
+          }}
+        />
+      </div>
+      <p
+        className="body-lg"
+        style={{
+          color: "var(--ink-3)",
+          transition: "opacity 300ms ease",
+          minHeight: 28,
+        }}
+      >
+        {messages[messageIndex]}
+      </p>
+    </div>
+  );
+}
+
+// --- Step 9: Mini-Builder Demo ---
+
+function StepMiniBuilder({
+  stylePrefs,
+  selectedPoseIds,
+  onTogglePose,
+}: {
+  stylePrefs: string[];
+  selectedPoseIds: string[];
+  onTogglePose: (id: string) => void;
+}) {
+  const miniPoses = getMiniBuilderPoses(stylePrefs);
+  const hasEnough = selectedPoseIds.length >= MINI_BUILDER_MIN_SELECT;
+  const styleName =
+    styles.find((s) => s.id === (stylePrefs[0] || "hatha-vinyasa"))?.name ||
+    "Hatha Vinyasa";
+
+  return (
+    <div style={{ padding: "0 24px" }}>
+      <h2
+        className="display-md"
+        style={{ color: "var(--ink)", marginBottom: 8 }}
+      >
+        Build your first flow
+      </h2>
+      <p className="body-lg" style={{ marginBottom: 8 }}>
+        Tap {MINI_BUILDER_MIN_SELECT}-4 poses from {styleName} to create a
+        sequence.
+      </p>
+      <div
+        className="mono"
+        style={{ color: "var(--ink-3)", marginBottom: 24, fontSize: 12 }}
+      >
+        {selectedPoseIds.length} SELECTED
+      </div>
+
+      {/* Selection strip */}
+      {selectedPoseIds.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginBottom: 24,
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            paddingBottom: 4,
+          }}
+        >
+          {selectedPoseIds.map((id) => {
+            const pose = miniPoses.find((p) => p.id === id);
+            if (!pose) return null;
+            const styleColor =
+              styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onTogglePose(id)}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: styleColor,
+                  border: "2px solid var(--ink)",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "inherit",
+                }}
+              >
+                <span className="mono" style={{ fontSize: 10, color: "#fff" }}>
+                  {pose.number}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Pose grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 12,
+        }}
+      >
+        {miniPoses.map((pose) => {
+          const isSelected = selectedPoseIds.includes(pose.id);
+          const styleColor =
+            styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+          return (
+            <button
+              key={pose.id}
+              type="button"
+              data-testid={`mini-pose-${pose.id}`}
+              onClick={() => onTogglePose(pose.id)}
+              style={{
+                borderRadius: 18,
+                border: isSelected
+                  ? "2px solid var(--ink)"
+                  : "1px solid var(--rule)",
+                background: "var(--card)",
+                cursor: "pointer",
+                overflow: "hidden",
+                textAlign: "left",
+                fontFamily: "inherit",
+                padding: 0,
+                transition: "border-color 200ms ease",
+              }}
+            >
+              <div
+                style={{
+                  height: 60,
+                  background: styleColor,
+                  opacity: 0.6,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  className="mono"
+                  style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}
+                >
+                  {String(pose.number).padStart(2, "0")}
+                </span>
+              </div>
+              <div style={{ padding: "12px 14px" }}>
+                <div
+                  className="display-sm"
+                  style={{
+                    color: "var(--ink)",
+                    fontSize: 14,
+                    marginBottom: 2,
+                  }}
+                >
+                  {pose.name}
+                </div>
+                <div
+                  className="small"
+                  style={{
+                    color: "var(--ink-3)",
+                    fontStyle: "italic",
+                    fontSize: 11,
+                  }}
+                >
+                  {pose.sanskrit_name}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Confirmation */}
+      {hasEnough && (
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: 24,
+            padding: "16px",
+            background: "var(--blush)",
+            borderRadius: 18,
+          }}
+        >
+          <p className="display-sm" style={{ color: "var(--ink)" }}>
+            You just built your first flow!
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Step 10: Value Delivery ---
+
+function StepValueDelivery({
+  selectedPoseIds,
+  onPlayNow,
+  onSaveContinue,
+}: {
+  selectedPoseIds: string[];
+  onPlayNow: () => void;
+  onSaveContinue: () => void;
+}) {
+  const selectedPoses = selectedPoseIds
+    .map((id) => poses.find((p) => p.id === id))
+    .filter(Boolean) as typeof poses;
+
+  const totalDuration = selectedPoses.reduce(
+    (sum, p) => sum + p.default_duration_seconds,
+    0
+  );
+
+  return (
+    <div style={{ padding: "0 24px" }}>
+      <h2
+        className="display-md"
+        style={{ color: "var(--ink)", marginBottom: 8 }}
+      >
+        Your first sequence
+      </h2>
+      <p className="body-lg" style={{ marginBottom: 24 }}>
+        Here is what you built. Try it out or save and continue.
+      </p>
+
+      {/* 3-column review grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 12,
+          marginBottom: 24,
+        }}
+      >
+        {selectedPoses.map((pose, i) => {
+          const styleColor =
+            styles.find((s) => s.id === pose.style_id)?.color || "#ccc";
+          return (
+            <div
+              key={`${pose.id}-${i}`}
+              style={{
+                borderRadius: 14,
+                border: "1px solid var(--rule)",
+                overflow: "hidden",
+                background: "var(--card)",
+              }}
+            >
+              <div
+                style={{
+                  height: 48,
+                  background: styleColor,
+                  opacity: 0.6,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  className="mono"
+                  style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}
+                >
+                  {String(pose.number).padStart(2, "0")}
+                </span>
+              </div>
+              <div style={{ padding: "10px 10px 12px" }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "var(--ink)",
+                    marginBottom: 4,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {pose.name}
+                </div>
+                <div
+                  className="mono"
+                  style={{ fontSize: 11, color: "var(--ink-3)" }}
+                >
+                  {formatDuration(pose.default_duration_seconds)}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Total duration */}
+      <div
+        className="mono"
+        style={{
+          textAlign: "center",
+          color: "var(--ink-3)",
+          marginBottom: 32,
+        }}
+      >
+        TOTAL: {formatDuration(totalDuration)}
+      </div>
+
+      {/* Actions */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <SplitPill label="Play Now" onClick={onPlayNow} />
+        <GhostButton label="Save & Continue" onClick={onSaveContinue} />
+      </div>
+    </div>
+  );
+}
+
+// --- Step 11: Account Gate ---
+
+function StepAccountGate({ onSkip }: { onSkip: () => void }) {
+  const [email, setEmail] = useState("");
+
+  return (
+    <div style={{ padding: "0 24px", textAlign: "center" }}>
+      <h2
+        className="display-md"
+        style={{ color: "var(--ink)", marginBottom: 8 }}
+      >
+        Save your progress
+      </h2>
+      <p className="body-lg" style={{ marginBottom: 32 }}>
+        Create an account to keep your sequences and practice history.
+      </p>
+      <div style={{ maxWidth: 340, margin: "0 auto" }}>
+        <input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          data-testid="email-input"
+          style={{
+            width: "100%",
+            padding: "16px 20px",
+            borderRadius: 14,
+            border: "1px solid var(--rule)",
+            background: "var(--card)",
+            fontSize: 16,
+            fontFamily: "inherit",
+            color: "var(--ink)",
+            outline: "none",
+            marginBottom: 16,
+            boxSizing: "border-box",
+          }}
+        />
+        <button
+          type="button"
+          data-testid="create-account-btn"
+          style={{
+            width: "100%",
+            padding: "16px 24px",
+            borderRadius: 14,
+            border: "none",
+            background: "var(--ink)",
+            color: "var(--pill-ink)",
+            fontSize: 16,
+            fontWeight: 600,
+            fontFamily: "inherit",
+            cursor: "pointer",
+            marginBottom: 20,
+          }}
+        >
+          Create Account
+        </button>
+        <button
+          type="button"
+          data-testid="skip-account"
+          onClick={onSkip}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 14,
+            color: "var(--ink-3)",
+            fontFamily: "inherit",
+            textDecoration: "underline",
+            padding: 0,
+          }}
+        >
+          Skip for now
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // --- Progress Indicator ---
 
 function ProgressIndicator({ step, total }: { step: number; total: number }) {
@@ -620,7 +1113,12 @@ function ProgressIndicator({ step, total }: { step: number; total: number }) {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { onboardingData, setOnboardingData } = useAppContext();
+  const {
+    onboardingData,
+    setOnboardingData,
+    setSelectedPoses,
+    setSavedSequences,
+  } = useAppContext();
   const [step, setStep] = useState(1);
   const [slideDir, setSlideDir] = useState<"left" | "right">("left");
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -644,6 +1142,9 @@ export default function OnboardingPage() {
     onboardingData.preferences.sessionLength || ""
   );
 
+  // Mini-builder selected pose ids (step 9)
+  const [miniBuilderPoseIds, setMiniBuilderPoseIds] = useState<string[]>([]);
+
   // Sync to context on changes
   useEffect(() => {
     setOnboardingData({
@@ -658,6 +1159,16 @@ export default function OnboardingPage() {
     });
   }, [selectedGoal, selectedPainPoints, tinderResults, stylePrefs, sessionLength, setOnboardingData]);
 
+  // Auto-advance from processing step after 3 seconds
+  useEffect(() => {
+    if (step === 8) {
+      const timer = setTimeout(() => {
+        setStep(9);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
+
   const animateTo = useCallback(
     (nextStep: number) => {
       if (isTransitioning) return;
@@ -671,15 +1182,18 @@ export default function OnboardingPage() {
     [step, isTransitioning]
   );
 
+  const completeOnboarding = useCallback(() => {
+    setOnboardingData((prev) => ({ ...prev, completed: true }));
+    router.push("/home");
+  }, [setOnboardingData, router]);
+
   const goNext = useCallback(() => {
     if (step < TOTAL_STEPS) {
       animateTo(step + 1);
     } else {
-      // Complete onboarding
-      setOnboardingData((prev) => ({ ...prev, completed: true }));
-      router.push("/home");
+      completeOnboarding();
     }
-  }, [step, animateTo, setOnboardingData, router]);
+  }, [step, animateTo, completeOnboarding]);
 
   const goBack = useCallback(() => {
     if (step > 1) animateTo(step - 1);
@@ -710,6 +1224,56 @@ export default function OnboardingPage() {
   const handleSelectLength = useCallback((len: string) => {
     setSessionLength(len);
   }, []);
+
+  const handleMiniBuilderToggle = useCallback(
+    (id: string) => {
+      setMiniBuilderPoseIds((prev) => {
+        if (prev.includes(id)) return prev.filter((p) => p !== id);
+        if (prev.length >= 4) return prev;
+        return [...prev, id];
+      });
+    },
+    []
+  );
+
+  const handlePlayNow = useCallback(() => {
+    // Load mini-builder poses into context and navigate to player
+    const selectedMiniPoses = miniBuilderPoseIds
+      .map((id) => poses.find((p) => p.id === id))
+      .filter(Boolean) as typeof poses;
+    setSelectedPoses(selectedMiniPoses);
+    setOnboardingData((prev) => ({ ...prev, completed: true }));
+    router.push("/player");
+  }, [miniBuilderPoseIds, setSelectedPoses, setOnboardingData, router]);
+
+  const handleSaveContinue = useCallback(() => {
+    // Save the mini-builder sequence to library
+    const selectedMiniPoses = miniBuilderPoseIds
+      .map((id) => poses.find((p) => p.id === id))
+      .filter(Boolean) as typeof poses;
+    if (selectedMiniPoses.length > 0) {
+      const durations: Record<string, number> = {};
+      let totalDuration = 0;
+      for (const p of selectedMiniPoses) {
+        durations[p.id] = p.default_duration_seconds;
+        totalDuration += p.default_duration_seconds;
+      }
+      setSavedSequences((prev) => [
+        ...prev,
+        {
+          id: `onboarding-${Date.now()}`,
+          name: "My First Flow",
+          poseIds: miniBuilderPoseIds,
+          durations,
+          styleId: selectedMiniPoses[0].style_id,
+          totalDuration,
+          createdAt: new Date().toISOString().split("T")[0],
+        },
+      ]);
+    }
+    // Advance to account gate
+    animateTo(11);
+  }, [miniBuilderPoseIds, setSavedSequences, animateTo]);
 
   const slideOffset = isTransitioning
     ? slideDir === "left"
@@ -822,10 +1386,28 @@ export default function OnboardingPage() {
             onSelectLength={handleSelectLength}
           />
         )}
+        {step === 8 && (
+          <StepProcessing stylePrefs={stylePrefs} goalId={selectedGoal} />
+        )}
+        {step === 9 && (
+          <StepMiniBuilder
+            stylePrefs={stylePrefs}
+            selectedPoseIds={miniBuilderPoseIds}
+            onTogglePose={handleMiniBuilderToggle}
+          />
+        )}
+        {step === 10 && (
+          <StepValueDelivery
+            selectedPoseIds={miniBuilderPoseIds}
+            onPlayNow={handlePlayNow}
+            onSaveContinue={handleSaveContinue}
+          />
+        )}
+        {step === 11 && <StepAccountGate onSkip={completeOnboarding} />}
       </div>
 
-      {/* Bottom CTA - steps 2+ (step 1 has its own CTA) */}
-      {step > 1 && (
+      {/* Bottom CTA - steps 2-7 and 9 (step 1 has own CTA, 8 auto-advances, 10 has own CTAs, 11 has own CTA) */}
+      {step > 1 && step <= 7 && (
         <div
           style={{
             position: "fixed",
@@ -841,10 +1423,45 @@ export default function OnboardingPage() {
             justifyContent: "center",
           }}
         >
-          <SplitPill
-            label={step === TOTAL_STEPS ? "Finish" : "Continue"}
-            onClick={goNext}
-          />
+          <SplitPill label="Continue" onClick={goNext} />
+        </div>
+      )}
+      {step === 9 && miniBuilderPoseIds.length >= MINI_BUILDER_MIN_SELECT && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+            maxWidth: 480,
+            padding: "16px 24px 32px",
+            background:
+              "linear-gradient(transparent, var(--bg) 20%)",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <SplitPill label="Continue" onClick={goNext} />
+        </div>
+      )}
+      {step === 11 && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+            maxWidth: 480,
+            padding: "16px 24px 32px",
+            background:
+              "linear-gradient(transparent, var(--bg) 20%)",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <SplitPill label="Finish" onClick={completeOnboarding} />
         </div>
       )}
     </div>
