@@ -107,3 +107,19 @@ Started: 2026-04-26
 - Files changed: package.json, all 7 test files under src/*/__tests__/
 - **Learnings:** Node's native ESM test runner requires explicit file extensions in imports. The tsx loader handles transpilation but doesn't resolve bare module paths. Always use `.ts`/`.tsx` extensions in test imports.
 ---
+
+## 2026-04-26 - US-006: Sequence Review screen with duration controls and total time
+- Created /builder/review route at src/app/(app)/builder/review/page.tsx
+- 3-column grid of selected poses from AppContext, each with placeholder image area, pose name, duration controls
+- Duration displayed in MM:SS mono format, adjustable via +/- buttons in 5-second increments
+- Default duration 30 seconds per pose, minimum 5 seconds
+- Side badge (L+R) on poses where has_sides is true using blush background pill
+- Total sequence duration in bottom-left with clock icon in mono font
+- Start split-pill button bottom-right navigates to /player
+- Back arrow icon button navigates to /builder
+- Overflow menu (...) with Save to Library dropdown option (placeholder for US-008)
+- Empty state when no poses selected, with CTA to go back to builder
+- Files changed: src/app/(app)/builder/review/page.tsx, src/components/__tests__/Review.test.ts
+- 17 tests: module export, has_sides field check, poses with sides exist, default_duration_seconds field, style-color mapping, MM:SS formatting (5 cases), duration controls logic (5 cases), total duration formatting (3 cases)
+- **Learnings:** The review page reads selectedPoses from AppContext set during the builder step. Duration state is local to the review page using a Record<string, number> keyed by pose id. The formatDuration helper uses padStart for consistent MM:SS display.
+---
