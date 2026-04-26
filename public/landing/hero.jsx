@@ -12,8 +12,8 @@ function Hero() {
       }}>
         {/* Background image */}
         <img
-          src="https://images.unsplash.com/photo-1599447421416-3414500d18a5?w=2400&q=85&auto=format&fit=crop"
-          alt="Yoga practice"
+          src="/images/hero-kaira.jpg"
+          alt="Yoga practitioner in warrior II pose in a sunlit studio"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
         {/* Soft gradient for legibility on bottom + top */}
