@@ -3,10 +3,12 @@
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
+import type { SavedSequence } from "@/context/AppContext";
 import { styles } from "@/data/styles";
 import { SplitPill } from "@/components/SplitPill";
 import { GhostButton } from "@/components/GhostButton";
 import { RegistrationMark } from "@/components/RegistrationMark";
+import { SaveSequenceModal } from "@/components/SaveSequenceModal";
 import type { Pose } from "@/data/poses";
 
 export const DEFAULT_DURATION = 30;
@@ -327,8 +329,10 @@ function OverflowMenu({
 /* --- Review Page --- */
 export default function ReviewPage() {
   const router = useRouter();
-  const { selectedPoses, setSelectedPoses } = useAppContext();
+  const { selectedPoses, setSelectedPoses, savedSequences, setSavedSequences } = useAppContext();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [savedMessage, setSavedMessage] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editSelected, setEditSelected] = useState<Set<string>>(new Set());
   const [sideLabels, setSideLabels] = useState<Record<string, string>>({});
@@ -485,6 +489,7 @@ export default function ReviewPage() {
               onToggle={() => setMenuOpen((v) => !v)}
               onSave={() => {
                 setMenuOpen(false);
+                setSaveModalOpen(true);
               }}
             />
           )}
@@ -521,6 +526,51 @@ export default function ReviewPage() {
           />
         ))}
       </div>
+
+      {/* Success message */}
+      {savedMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 16,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "var(--ink)",
+            color: "var(--pill-ink)",
+            padding: "12px 24px",
+            borderRadius: 999,
+            fontSize: 13,
+            fontWeight: 600,
+            zIndex: 110,
+            letterSpacing: "0.04em",
+          }}
+        >
+          Saved to Library
+        </div>
+      )}
+
+      {/* Save modal */}
+      {saveModalOpen && (
+        <SaveSequenceModal
+          onCancel={() => setSaveModalOpen(false)}
+          onSave={(name: string) => {
+            const styleId = selectedPoses[0]?.style_id ?? "";
+            const newSeq: SavedSequence = {
+              id: `saved-${Date.now()}`,
+              name,
+              poseIds: selectedPoses.map((p) => p.id),
+              durations: { ...durations },
+              styleId,
+              totalDuration,
+              createdAt: new Date().toISOString().split("T")[0],
+            };
+            setSavedSequences((prev) => [...prev, newSeq]);
+            setSaveModalOpen(false);
+            setSavedMessage(true);
+            setTimeout(() => setSavedMessage(false), 2000);
+          }}
+        />
+      )}
 
       {/* Bottom Bar */}
       <div

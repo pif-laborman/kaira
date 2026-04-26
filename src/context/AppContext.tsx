@@ -9,6 +9,8 @@ export interface SavedSequence {
   name: string;
   poseIds: string[];
   durations: Record<string, number>;
+  styleId?: string;
+  totalDuration?: number;
   createdAt: string;
 }
 
