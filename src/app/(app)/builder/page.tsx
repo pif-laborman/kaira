@@ -8,6 +8,8 @@ import { useAppContext } from "@/context/AppContext";
 import { SplitPill } from "@/components/SplitPill";
 import { GhostButton } from "@/components/GhostButton";
 import { RegistrationMark } from "@/components/RegistrationMark";
+import { FilterPanel, emptyFilters } from "@/components/FilterPanel";
+import type { FilterState } from "@/components/FilterPanel";
 import type { Pose } from "@/data/poses";
 import type { YogaStyle } from "@/data/styles";
 
@@ -275,11 +277,35 @@ function BuilderContent() {
   const initialStyle = styles.find((s) => s.name === initialStyleName) ?? styles[0];
   const [currentStyle, setCurrentStyle] = useState<YogaStyle>(initialStyle);
   const [overlayOpen, setOverlayOpen] = useState(false);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>(emptyFilters);
 
-  const filteredPoses = useMemo(
-    () => poses.filter((p) => p.style_id === currentStyle.id),
-    [currentStyle.id],
-  );
+  const filteredPoses = useMemo(() => {
+    let result = poses.filter((p) => p.style_id === currentStyle.id);
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.sanskrit_name.toLowerCase().includes(q),
+      );
+    }
+
+    if (filters.categoryIds.length > 0) {
+      result = result.filter((p) =>
+        filters.categoryIds.some((cid) => p.categories.includes(cid)),
+      );
+    }
+
+    if (filters.chakraIds.length > 0) {
+      result = result.filter((p) =>
+        filters.chakraIds.some((cid) => p.chakras.includes(cid)),
+      );
+    }
+
+    return result;
+  }, [currentStyle.id, filters]);
 
   const selectedIds = useMemo(
     () => new Set(selectedPoses.map((p) => p.id)),
@@ -410,7 +436,14 @@ function BuilderContent() {
           zIndex: 50,
         }}
       >
-        <GhostButton label="Filters" onClick={() => {}} />
+        <GhostButton
+          label={
+            filters.categoryIds.length + filters.chakraIds.length > 0
+              ? `Filters (${filters.categoryIds.length + filters.chakraIds.length})`
+              : "Filters"
+          }
+          onClick={() => setFilterPanelOpen(true)}
+        />
         <SplitPill
           label="Next"
           onClick={() => router.push("/builder/review")}
@@ -423,6 +456,15 @@ function BuilderContent() {
           selectedStyleId={currentStyle.id}
           onSelect={handleSelectStyle}
           onClose={() => setOverlayOpen(false)}
+        />
+      )}
+
+      {/* Filter Panel */}
+      {filterPanelOpen && (
+        <FilterPanel
+          filters={filters}
+          onChange={setFilters}
+          onClose={() => setFilterPanelOpen(false)}
         />
       )}
     </div>
