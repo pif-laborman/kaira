@@ -200,3 +200,18 @@ Started: 2026-04-26
 - 18 tests: module exports, formatDuration (5 cases), calculateStreak (8 cases: empty, today, consecutive, duplicates, gap, stale, yesterday start, unordered), data integrity (styles, practice sessions, SplitPill, GhostButton exports)
 - **Learnings:** Streak calculation needs to handle: deduplication of dates, yesterday as valid start, unordered input. The complete page reads the most recent practiceHistory entry (just recorded by player) for session stats.
 ---
+
+## 2026-04-26 - US-012: Library screen with saved sequences, search, and empty state
+- Upgraded existing library page from US-008 with full US-012 acceptance criteria
+- 'Your Library' heading in display-lg typography
+- Search input filters saved sequences by name (case-insensitive, client-side)
+- Sequence cards show: pose-color thumbnail strip (one colored segment per pose), name, duration pill (tag-bg bg, mono font), pose count
+- Clicking a sequence loads its poses into selectedPoses context and navigates to /builder/review
+- Empty state: 'No sequences yet. Build your first flow.' with split-pill CTA to /builder
+- Search no-results state shows the query text
+- Pre-seeded with 2 example sequences (Morning Sun Flow, Evening Wind Down) from AppContext SEED_SEQUENCES
+- Exported pure helpers: formatTotalDuration, filterSequencesByName for testability
+- Files changed: src/app/(app)/library/page.tsx, src/components/__tests__/Library.test.ts (new)
+- 16 tests: module exports (3), formatTotalDuration (4 cases), filterSequencesByName (6 cases: empty, whitespace, partial, case-insensitive, no match, middle match), seed data integrity (3: context exports, valid pose ids, style color mapping)
+- **Learnings:** Loading a saved sequence into review = set selectedPoses in context from poseIds lookup, then navigate. The thumbnail strip pattern (flex row of colored divs with flex:1) creates an effective visual fingerprint for sequences.
+---
