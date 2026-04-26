@@ -12,6 +12,7 @@ import { FilterPanel, emptyFilters } from "@/components/FilterPanel";
 import type { FilterState } from "@/components/FilterPanel";
 import type { Pose } from "@/data/poses";
 import type { YogaStyle } from "@/data/styles";
+import { PoseDetailModal } from "@/components/PoseDetailModal";
 
 /* --- Style Grid Overlay --- */
 function StyleOverlay({
@@ -121,86 +122,129 @@ function PoseCard({
   styleColor,
   isSelected,
   onToggle,
+  onInfo,
 }: {
   pose: Pose;
   styleColor: string;
   isSelected: boolean;
   onToggle: () => void;
+  onInfo: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onToggle}
+    <div
       style={{
         background: "var(--card)",
         borderRadius: 18,
         border: isSelected ? "2px solid var(--ink)" : "1px solid var(--rule)",
-        padding: 0,
         overflow: "hidden",
         cursor: "pointer",
         textAlign: "left",
         fontFamily: "inherit",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
       }}
     >
-      <div
+      <button
+        type="button"
+        onClick={onToggle}
         style={{
-          height: 100,
-          background: styleColor,
-          opacity: 0.35,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
+          background: "none",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          textAlign: "left",
+          fontFamily: "inherit",
+          width: "100%",
         }}
       >
-        <span
-          className="mono"
+        <div
           style={{
-            position: "absolute",
-            top: 8,
-            left: 10,
-            color: "var(--ink)",
-            opacity: 0.7,
+            height: 100,
+            background: styleColor,
+            opacity: 0.35,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
           }}
         >
-          {String(pose.number).padStart(2, "0")}
-        </span>
-        {isSelected && (
           <span
+            className="mono"
             style={{
               position: "absolute",
               top: 8,
-              right: 10,
-              width: 22,
-              height: 22,
-              borderRadius: 999,
-              background: "var(--ink)",
-              color: "var(--pill-ink)",
-              fontSize: 12,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 700,
+              left: 10,
+              color: "var(--ink)",
+              opacity: 0.7,
             }}
           >
-            &#10003;
+            {String(pose.number).padStart(2, "0")}
           </span>
-        )}
-      </div>
-      <div style={{ padding: "12px 14px" }}>
-        <p className="display-sm" style={{ fontSize: 15, marginBottom: 2, color: "var(--ink)" }}>
-          {pose.name}
-        </p>
-        <p className="small" style={{ color: "var(--ink-3)", marginBottom: 6, fontStyle: "italic" }}>
-          {pose.sanskrit_name}
-        </p>
-        <p className="small" style={{ color: "var(--ink-2)", lineHeight: 1.4 }}>
-          {pose.instruction_text}
-        </p>
-      </div>
-    </button>
+          {isSelected && (
+            <span
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 10,
+                width: 22,
+                height: 22,
+                borderRadius: 999,
+                background: "var(--ink)",
+                color: "var(--pill-ink)",
+                fontSize: 12,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+              }}
+            >
+              &#10003;
+            </span>
+          )}
+        </div>
+        <div style={{ padding: "12px 14px" }}>
+          <p className="display-sm" style={{ fontSize: 15, marginBottom: 2, color: "var(--ink)" }}>
+            {pose.name}
+          </p>
+          <p className="small" style={{ color: "var(--ink-3)", marginBottom: 6, fontStyle: "italic" }}>
+            {pose.sanskrit_name}
+          </p>
+          <p className="small" style={{ color: "var(--ink-2)", lineHeight: 1.4 }}>
+            {pose.instruction_text}
+          </p>
+        </div>
+      </button>
+      {/* Info button to open pose detail */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onInfo();
+        }}
+        aria-label={`View details for ${pose.name}`}
+        style={{
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+          width: 28,
+          height: 28,
+          borderRadius: 999,
+          border: "1px solid var(--rule)",
+          background: "var(--bg)",
+          cursor: "pointer",
+          fontSize: 14,
+          fontWeight: 700,
+          color: "var(--ink-3)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "inherit",
+        }}
+      >
+        i
+      </button>
+    </div>
   );
 }
 
@@ -279,6 +323,7 @@ function BuilderContent() {
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
+  const [detailPose, setDetailPose] = useState<Pose | null>(null);
 
   const filteredPoses = useMemo(() => {
     let result = poses.filter((p) => p.style_id === currentStyle.id);
@@ -416,6 +461,7 @@ function BuilderContent() {
             styleColor={currentStyle.color}
             isSelected={selectedIds.has(pose.id)}
             onToggle={() => togglePose(pose)}
+            onInfo={() => setDetailPose(pose)}
           />
         ))}
       </div>
@@ -465,6 +511,14 @@ function BuilderContent() {
           filters={filters}
           onChange={setFilters}
           onClose={() => setFilterPanelOpen(false)}
+        />
+      )}
+
+      {/* Pose Detail Modal */}
+      {detailPose && (
+        <PoseDetailModal
+          pose={detailPose}
+          onClose={() => setDetailPose(null)}
         />
       )}
     </div>
