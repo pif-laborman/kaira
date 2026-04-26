@@ -275,3 +275,18 @@ Started: 2026-04-26
 - 28 tests: module exports (6), computeStats (4 cases: empty, totalSessions, totalMinutes rounding, posesPracticed), calculateStreak (6 cases: empty, today, consecutive, duplicates, stale, yesterday start), getCalendarDays (4 cases: April days, null padding, first day, Feb non-leap), formatSessionDuration (4 cases), formatSessionDate (1 case), data integrity (3 cases)
 - **Learnings:** practiceHistory in AppContext needed seeding with fixture data for the progress screen to be useful on first load (was [] before). The getCalendarDays helper using firstDay offset + daysInMonth is a clean pattern for month grid rendering.
 ---
+
+## 2026-04-26 - US-017: Pose encyclopedia with browse, style filter, and search
+- Created /poses route at src/app/(app)/poses/page.tsx
+- 'Pose Library' heading in display-lg typography
+- Total pose count displayed in mono text below heading (dynamic, reflects filtered count)
+- Search input filters by pose name or Sanskrit name (case-insensitive)
+- Style filter pills: All + 7 yoga styles using Pill component, active state toggles
+- Responsive grid (auto-fill, minmax 200px) of pose cards: placeholder color block with pose number, name, Sanskrit name (italic), style pill (tag-bg), chakra dots (colored circles)
+- Clicking any card opens PoseDetailModal (reused from US-009)
+- Empty state when no poses match filters
+- Exported pure helpers: filterPoses, getStyleColor, getStyleName for testability
+- Files changed: src/app/(app)/poses/page.tsx (new), src/components/__tests__/PoseEncyclopedia.test.ts (new)
+- 22 tests: module exports (6), filterPoses (8 cases: all, by style, by name, by Sanskrit, combined, no match, whitespace, case-insensitive), getStyleColor (2 cases), getStyleName (2 cases), style pills count, unique ids, data integrity (3: valid style_ids, valid chakras, name fields), pose count, per-style coverage
+- **Learnings:** The filterPoses helper pattern (chain of filter operations with early returns for "all"/"empty") is clean and testable. Responsive grid with auto-fill + minmax handles 3-4 columns naturally without media queries.
+---
