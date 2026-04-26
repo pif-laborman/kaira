@@ -2,377 +2,317 @@
 
 import { useState } from "react";
 
-const benefitCards = [
-  { title: "Smart Sequencing", desc: "Build flows in seconds with intelligent suggestions based on your choices.", gradient: "card-teal" },
-  { title: "Guided Practice", desc: "Follow your sequences with voice cues, gongs, or full video instruction.", gradient: "card-amber" },
-  { title: "Expert Flows", desc: "Access pre-made sequences designed by certified teachers for every goal.", gradient: "card-sage" },
-  { title: "Every Style", desc: "From Hatha Vinyasa to Yin, Restorative, Chair Yoga, and beyond.", gradient: "card-indigo" },
-];
+function Cross({ className = "", light = false }: { className?: string; light?: boolean }) {
+  return (
+    <div className={`cross ${light ? "cross-light" : ""} w-4 h-4 ${className}`} />
+  );
+}
 
-const yogaStyles = [
-  { name: "Hatha Vinyasa", desc: "Dynamic flow linking breath and movement" },
-  { name: "Yin Yoga", desc: "Deep, slow holds for flexibility and release" },
-  { name: "Restorative", desc: "Gentle, supported poses for deep relaxation" },
-  { name: "Chair Yoga", desc: "Accessible practice for all abilities" },
-  { name: "Kundalini", desc: "Energy work combining breath, mantra, and movement" },
-  { name: "Mudra & Meditation", desc: "Hand gestures and stillness practices" },
-];
+function ArrowBtn({ dark = false, href = "#" }: { dark?: boolean; href?: string }) {
+  return (
+    <a href={href} className={`btn-press w-10 h-10 rounded-full border flex items-center justify-center shrink-0 transition-colors duration-200 ${dark ? "border-white/20 text-white hover:bg-white/10" : "border-[#1C1C1C]/15 text-[#1C1C1C] hover:bg-[#1C1C1C]/5"}`}>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </a>
+  );
+}
 
-const features = [
-  { icon: "🧠", title: "Intelligent Sequence Builder", desc: "Filter by style, chakra, meridian, benefit, or name. Get smart suggestions that flow naturally." },
-  { icon: "▶️", title: "Sequence Player", desc: "Be guided through your sequences exactly as you designed them. Voice, gongs, or video." },
-  { icon: "🧘‍♀️", title: "Pre-Made Flows", desc: "Expert-crafted sequences for energy, relaxation, flexibility, and strength." },
-  { icon: "🔍", title: "Advanced Filtering", desc: "Find exactly what you need across hundreds of poses and transitions." },
-  { icon: "🧘‍♂️", title: "Multi-Style Support", desc: "Hatha, Yin, Restorative, Chair, Kundalini, and more. All in one app." },
+const styles = [
+  { name: "Hatha Vinyasa", color: "bg-[#C5D8C0]" },
+  { name: "Yin Yoga", color: "bg-[#C0CED8]" },
+  { name: "Restorative", color: "bg-[#E8DFC0]" },
+  { name: "Chair Yoga", color: "bg-[#E8C4C0]" },
+  { name: "Kundalini", color: "bg-[#D0C5D8]" },
+  { name: "Meditation", color: "bg-[#C5D8D0]" },
 ];
 
 const testimonials = [
-  { name: "Maya", role: "Yoga Teacher", text: "This is the first yoga app I genuinely want to use for class preparation. The sequence builder is incredibly intuitive." },
-  { name: "Daniel", role: "Practitioner & Beta Tester", text: "I'm still new to yoga, but Kaira made it feel personal from day one. The guided flows break down each pose clearly." },
-  { name: "Priya", role: "Studio Owner", text: "The pre-made flows are a total game-changer for busy days. And the player? Nothing else like it." },
-  { name: "Lars", role: "Software Engineer & Yogi", text: "What's already here is impressive, but the roadmap is what excites me most. This team knows what they're building." },
-  { name: "Sofia", role: "Long-Time Practitioner", text: "I was skeptical of another yoga app. Kaira changed my mind. It keeps the mindful, intentional vibe I need." },
-  { name: "Aisha", role: "Yoga Teacher & Beta Tester", text: "I've seen many digital tools come and go, but this feels different. It honors the roots of the practice." },
+  {
+    name: "Ann S.",
+    role: "Yoga Teacher, 10 years",
+    text: "The first yoga app I genuinely want to use for class preparation. I used to spend 45 minutes planning each class. Now it takes me 10. My sequences are better, too.",
+  },
+  {
+    name: "Luca M.",
+    role: "Beginner, 3 months in",
+    text: "I'm still pretty new to yoga, but Kaira made it feel personal from day one. The videos break down each pose clearly. It's like having a teacher with me anytime I practice.",
+  },
+  {
+    name: "Julia H.",
+    role: "Marketing Director & Mum of Two",
+    text: "I haven't had a ton of time to dive into the sequence builder yet. But the pre-made flows? Total game-changer for 6am sessions before the kids wake up.",
+  },
 ];
 
 const faqs = [
-  { q: "How does pricing work?", a: "Choose monthly, quarterly, or yearly. All plans include every current and future feature. Cancel anytime." },
-  { q: "Will my subscription price ever increase?", a: "If you subscribe on our website, your price is locked in for life. It will never increase as long as your subscription stays active." },
-  { q: "Can I cancel anytime?", a: "Yes. No commitments, no penalties. Cancel anytime and keep access until your current period ends." },
-  { q: "What's the difference between subscribing here vs. in the app stores?", a: "Subscribing here saves you 15-30% because we avoid app store commissions. You also get exclusive bonuses like the digital magazine and community access." },
-  { q: "What devices is Kaira available on?", a: "Currently available on iOS and Android. A web version is planned for 2026." },
-  { q: "Can I share my sequences with others?", a: "Social sharing and teacher-student features are on our roadmap and coming soon." },
+  {
+    category: "Pricing",
+    items: [
+      { q: "How does pricing work?", a: "Choose monthly, quarterly, or yearly. All plans include every current and future feature. No tiers, no feature gates. You get everything." },
+      { q: "Will my price ever increase?", a: "Not if you subscribe on this site. You get price-lock for life. Your rate stays the same as long as your subscription is active. This guarantee only applies to web subscribers." },
+      { q: "What's the difference between subscribing here vs. in the app stores?", a: "You save 15-30% (we pass on the savings from avoiding app store commissions). Plus you get exclusive bonuses: the monthly digital magazine, private community access, and lifetime price lock. These are only available through this site." },
+      { q: "Can I cancel anytime?", a: "Yes. No commitments, no penalties, no questions asked. You keep access until your current billing period ends." },
+    ],
+  },
+  {
+    category: "Features",
+    items: [
+      { q: "How is Kaira different from Down Dog, Alo Moves, or Glo?", a: "Those apps give you pre-recorded video classes. You hit play, you follow along. Kaira is the opposite: you design your own sequences (or pick expert-crafted ones), and the app guides you through them with voice cues, gongs, or video. You're the creator, not just the viewer." },
+      { q: "I'm a complete beginner. Is this too advanced for me?", a: "Not at all. Every pose includes alignment cues, modifications, and video guidance. The pre-made flows range from gentle beginner sequences to advanced vinyasa. Start with pre-made, and build your own when you're ready." },
+      { q: "Can I use this for class planning as a teacher?", a: "That's one of the most popular use cases. Filter by style, chakra, meridian, or benefit. The builder suggests poses that naturally follow your choices. Teachers tell us it cuts class prep time by 70%." },
+    ],
+  },
+  {
+    category: "Technical",
+    items: [
+      { q: "What devices does Kaira work on?", a: "iOS and Android right now. Web version is on the roadmap for 2026." },
+      { q: "Does it work offline?", a: "Yes. Build and play sequences without an internet connection. Your library syncs when you're back online." },
+    ],
+  },
 ];
 
-const teamMembers = [
-  { name: "Alex", role: "CEO & Founder", desc: "A decade of scaling startups, now building the yoga app that should have existed years ago." },
-  { name: "Mira", role: "Co-Founder & Product Lead", desc: "20+ years of yoga practice. Designed the original card decks that started it all." },
-  { name: "Kai", role: "Lead Developer", desc: "Former engineer at top tech companies. Building from the Amazon to the app store." },
-  { name: "Lena", role: "Designer", desc: "The visual mind behind the brand. Every pixel is intentional." },
-  { name: "Nora", role: "Yoga Expert & Content Lead", desc: "Deep study in India. Bridging ancient philosophy with modern technology." },
-  { name: "Sam", role: "Yoga Expert & Contributor", desc: "1,500+ hours certified. Teaching is a craft, and this tool elevates it." },
+const team = [
+  { name: "Alex Rivera", role: "CEO & Founder" },
+  { name: "Mira Chen", role: "Product Lead" },
+  { name: "Kai Santos", role: "Lead Developer" },
 ];
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [showAllTestimonials, setShowAllTestimonials] = useState(false);
+  const [activeStyle, setActiveStyle] = useState("ALL");
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+
+  const faqFlat = faqs.flatMap((cat) => cat.items);
 
   return (
     <>
-      {/* Sticky Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-transparent">
-        <div className="text-2xl font-bold text-white">
-          <span className="gradient-text">K</span>
-        </div>
-        <a
-          href="#pricing"
-          className="bg-[#F0965A] text-white rounded-full px-6 py-3 text-base font-medium hover:bg-[#E08548] transition-colors"
-        >
-          Unlock Kaira
-        </a>
-      </nav>
-
-      {/* Section 1: Hero */}
-      <section className="hero-gradient min-h-screen flex items-center relative overflow-hidden">
-        <div className="max-w-[1200px] mx-auto px-6 py-24 flex flex-col lg:flex-row items-center gap-12 w-full">
-          <div className="flex-1 text-white">
-            <h1 className="text-4xl lg:text-[55px] font-semibold leading-[1] mb-6">
-              KAIRA: The Intelligent{" "}
-              <span className="gradient-text">Yoga Experience</span>{" "}
-              That Adapts to YOU
-            </h1>
-            <p className="text-lg leading-[27px] mb-8 max-w-lg opacity-90">
-              For the first time, design your own yoga sequences with smart, real-time suggestions.
-              Then let Kaira guide you through them, exactly as you created them.
-            </p>
-            <a
-              href="#why"
-              className="inline-block bg-[#F0965A] text-white rounded-full px-8 py-4 text-base font-medium hover:bg-[#E08548] transition-colors"
-            >
-              Learn More
+      {/* Nav */}
+      <nav className="fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-[1360px] mx-auto px-8 py-5 flex items-center justify-between">
+          <span className="text-[15px] font-semibold tracking-wide text-white">Kaira</span>
+          <div className="flex items-center gap-6">
+            <a href="#features" className="text-[13px] text-white/60 hover:text-white transition-colors duration-200 hidden md:block">Features</a>
+            <a href="#pricing" className="text-[13px] text-white/60 hover:text-white transition-colors duration-200 hidden md:block">Pricing</a>
+            <a href="#pricing" className="btn-press text-[12px] font-semibold tracking-[0.08em] uppercase bg-white text-[#1C1C1C] px-5 py-2.5 rounded-full hover:bg-white/90 transition-colors duration-200">
+              Get Access
             </a>
           </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-[280px] h-[500px] bg-black/20 rounded-[40px] border-2 border-white/10 flex items-center justify-center">
-              <span className="text-white/40 text-sm">App Preview</span>
-            </div>
-          </div>
         </div>
-      </section>
+      </nav>
 
-      {/* Section 2: Why Kaira */}
-      <section id="why" className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-4">
-            Why Kaira? Because Yoga Deserves{" "}
-            <span className="gradient-text">Better</span>
-          </h2>
-          <p className="text-center text-[#666] max-w-[600px] mx-auto mb-16">
-            Generic apps give you generic flows. Kaira gives you the tools to practice on your own terms.
+      {/* Hero */}
+      <section className="relative min-h-screen flex flex-col justify-end overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="/images/hero-yoga.jpg"
+            alt="Yoga practitioner in warrior pose at sunset"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{
+            background: `linear-gradient(180deg, rgba(28,28,28,0.3) 0%, rgba(28,28,28,0.1) 30%, rgba(28,28,28,0.5) 60%, rgba(28,28,28,0.92) 100%)`
+          }} />
+        </div>
+
+        <Cross className="absolute top-20 left-8 z-20" light />
+        <Cross className="absolute top-20 right-8 z-20" light />
+
+        <div className="relative z-10 max-w-[1360px] mx-auto px-8 pb-12 pt-40 w-full">
+          <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-white/40 mb-5 fade-up">
+            Stop following. Start designing.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefitCards.map((card) => (
-              <div
-                key={card.title}
-                className={`${card.gradient} rounded-t-[20px] rounded-b-none p-8 text-white min-h-[240px] flex flex-col justify-end`}
-              >
-                <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                <p className="text-white/90 text-base leading-relaxed">{card.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Section 3: Closer Look (Video) */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-            Take a Closer Look at{" "}
-            <span className="gradient-text">Kaira</span>
-          </h2>
-          <p className="text-[#666] mb-12">
-            See how the Sequence Builder, Player, and Pre-Made Flows work together.
-          </p>
-          <div className="aspect-video bg-[#0F1C2E] rounded-2xl flex items-center justify-center">
-            <div className="text-white/40 text-center">
-              <div className="text-5xl mb-4">▶</div>
-              <p>Demo Video</p>
+          <h1 className="text-[clamp(3rem,9vw,7rem)] font-bold leading-[0.9] tracking-[-0.04em] text-white uppercase mb-10 fade-up" style={{ animationDelay: '80ms' }}>
+            Your practice.<br />
+            <span className="text-white/40">Your sequences.</span>
+          </h1>
+
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-4 border-t border-white/10 pt-6">
+            <div className="max-w-[460px] fade-up" style={{ animationDelay: '160ms' }}>
+              <p className="text-[16px] leading-[1.7] text-white/70 mb-2">
+                <strong className="text-white">Kaira is not another video class app.</strong>
+              </p>
+              <p className="text-[15px] leading-[1.7] text-white/50">
+                Design custom yoga sequences in seconds, then get guided through them with voice, gongs, or video. For teachers who prep classes, practitioners who want control, and anyone tired of rigid, pre-recorded flows.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 fade-up" style={{ animationDelay: '240ms' }}>
+              <a href="#pricing" className="btn-press text-[12px] font-semibold tracking-[0.08em] uppercase bg-white text-[#1C1C1C] px-7 py-3.5 rounded-full hover:bg-white/90 transition-colors duration-200">
+                Start Building Flows
+              </a>
+              <ArrowBtn dark href="#why" />
             </div>
           </div>
         </div>
+
+        <Cross className="absolute bottom-6 left-8 z-20" light />
+        <Cross className="absolute bottom-6 right-8 z-20" light />
       </section>
 
-      {/* Section 4: Sequence Building */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-          <div className="flex-1">
-            <div className="w-full max-w-[400px] mx-auto h-[500px] bg-gray-100 rounded-[20px] flex items-center justify-center">
-              <span className="text-[#666] text-sm">Sequence Builder Screenshot</span>
-            </div>
-          </div>
-          <div className="flex-1">
-            <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-              Sequence Building,{" "}
-              <span className="gradient-text">Reimagined</span>
+      {/* Social proof bar */}
+      <section className="py-5 border-b border-[#1C1C1C]/8">
+        <div className="max-w-[1360px] mx-auto px-8 flex flex-wrap items-center justify-center gap-8 md:gap-16">
+          {["4.6 App Store rating", "71 countries", "6 yoga styles", "Class prep cut by 70%"].map((stat) => (
+            <span key={stat} className="text-[12px] tracking-[0.15em] uppercase text-[#8A8478] font-medium">{stat}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* Why Kaira - Problem agitation (NEW SECTION) */}
+      <section id="why" className="py-24 relative">
+        <Cross className="absolute top-8 left-8" />
+        <div className="max-w-[900px] mx-auto px-8">
+          <div className="text-center mb-14">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">The problem</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1] mb-6">
+              Most yoga apps treat you like a passenger
             </h2>
-            <p className="text-[#666] mb-6 leading-relaxed">
-              Design complete yoga flows in seconds. Filter by style, chakra, meridian, benefit, or name.
-              Kaira suggests poses that naturally follow your choices, helping your sequences unfold with
-              clarity and purpose.
-            </p>
-            <p className="text-[#666] leading-relaxed">
-              Every pose includes expert video guidance. Whether you&apos;re learning, teaching, or refining,
-              everything you need is one tap away.
+            <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60 max-w-[600px] mx-auto">
+              Pre-recorded classes. Fixed sequences. Hit play, follow along, repeat. No room to explore your own practice. No way to customize for your body, your students, or your schedule.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Section 5: Learn Faster */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col lg:flex-row-reverse items-center gap-16">
-          <div className="flex-1 flex gap-4 justify-center">
-            <div className="w-[200px] h-[380px] bg-gray-100 rounded-[16px] flex items-center justify-center">
-              <span className="text-[#666] text-xs">Info Card 1</span>
-            </div>
-            <div className="w-[200px] h-[380px] bg-gray-100 rounded-[16px] flex items-center justify-center">
-              <span className="text-[#666] text-xs">Info Card 2</span>
-            </div>
-          </div>
-          <div className="flex-1">
-            <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-              Learn Faster. Remember More.{" "}
-              <span className="gradient-text">Deepen Your Practice.</span>
-            </h2>
-            <p className="text-[#666] leading-relaxed">
-              Every pose comes with detailed instruction, alignment cues, and modifications.
-              Build muscle memory through repetition with your own custom sequences.
-              Track your progress and watch your practice evolve.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 6: Pre-Made Flows */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-4">
-            Pre-Made Flows:{" "}
-            <span className="gradient-text">Expertly Crafted</span>, Ready When You Are
-          </h2>
-          <p className="text-center text-[#666] max-w-[600px] mx-auto mb-12">
-            Don&apos;t want to build from scratch? Choose from expert-designed sequences for energy,
-            relaxation, flexibility, and strength.
-          </p>
-          <div className="flex gap-4 justify-center overflow-x-auto pb-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="min-w-[240px] h-[390px] bg-gray-100 rounded-[16px] flex items-center justify-center shrink-0"
-              >
-                <span className="text-[#666] text-sm">Flow {i}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 7: Yoga Player */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-          <div className="flex-1">
-            <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-              The World&apos;s First{" "}
-              <span className="gradient-text">Yoga Player</span>{" "}
-              for Sequences You Create
-            </h2>
-            <p className="text-[#666] mb-6 leading-relaxed">
-              Other apps give you their sequences. Kaira guides you through yours. Choose voice cues,
-              gongs, or full video instruction. Set your own pace. Practice your way.
-            </p>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-[280px] h-[460px] bg-gray-100 rounded-[20px] flex items-center justify-center">
-              <span className="text-[#666] text-sm">Player Screenshot</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 8: Pick Your Style */}
-      <section className="py-24 bg-[#0F1C2E]">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center text-white mb-4">
-            Pick Your{" "}
-            <span className="gradient-text">Style</span>
-          </h2>
-          <p className="text-center text-white/70 max-w-[600px] mx-auto mb-12">
-            From dynamic vinyasa to gentle restorative, Kaira supports the styles you love.
-          </p>
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-            {yogaStyles.map((style) => (
-              <div
-                key={style.name}
-                className="min-w-[180px] bg-white/10 rounded-[16px] p-6 text-white flex flex-col items-center text-center shrink-0 snap-start"
-              >
-                <div className="w-[120px] h-[160px] bg-white/5 rounded-xl mb-4 flex items-center justify-center">
-                  <span className="text-white/30 text-xs">{style.name}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              {
+                label: "If you teach",
+                problem: "You spend 30-60 minutes planning every class. Scribbling sequences on paper, searching YouTube for transitions, second-guessing the flow.",
+                solve: "Build a full class sequence in under 10 minutes. Filter by style, chakra, or benefit. Smart suggestions handle transitions.",
+              },
+              {
+                label: "If you practice solo",
+                problem: "You're stuck choosing between rigid pre-recorded classes that don't fit your level, or freestyling with no structure at all.",
+                solve: "Design sequences that match your body and goals. Or pick from expert-crafted flows and let the player guide you through every pose.",
+              },
+              {
+                label: "If you're short on time",
+                problem: "You skip practice because you don't have 60 minutes. Finding the right class takes longer than doing the class.",
+                solve: "Pre-made flows from 10 to 90 minutes. No browsing, no decision fatigue. Pick one and start. Done.",
+              },
+              {
+                label: "If you're just starting",
+                problem: "Every app assumes you already know what Chaturanga is. You feel lost, unsure if you're doing poses correctly, afraid of injury.",
+                solve: "Every pose includes video guidance, alignment cues, and modifications. Start with beginner flows. Build confidence, then build your own.",
+              },
+            ].map((card) => (
+              <div key={card.label} className="bg-[#F2EDE6] rounded-2xl p-7">
+                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#8A8478] mb-3">{card.label}</p>
+                <p className="text-[14px] leading-[1.7] text-[#1C1C1C]/50 mb-4">{card.problem}</p>
+                <div className="border-t border-[#1C1C1C]/8 pt-4">
+                  <p className="text-[14px] leading-[1.7] text-[#1C1C1C]/80 font-medium">{card.solve}</p>
                 </div>
-                <h3 className="text-base font-semibold mb-1">{style.name}</h3>
-                <p className="text-sm text-white/60">{style.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Section 9: Beyond Movement */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-            Yoga in Its Most{" "}
-            <span className="gradient-text">Authentic Form</span>{" "}
-            - Beyond Just Movement
-          </h2>
-          <p className="text-[#666] leading-relaxed mb-6">
-            Kaira goes beyond asana. Pranayama, mudras, meditation, mantras, and chanting are
-            part of the experience. Because yoga was never just about the poses.
-          </p>
-          <p className="text-[#666] leading-relaxed">
-            Some elements are live now. Others are part of our upcoming content roadmap.
-            But the vision is clear: a complete practice, not just a workout.
-          </p>
-        </div>
-      </section>
+      {/* Styles grid */}
+      <section id="features" className="py-24 relative bg-[#F2EDE6]">
+        <Cross className="absolute top-8 left-8" />
+        <Cross className="absolute top-8 right-8" />
+        <div className="max-w-[1360px] mx-auto px-8">
+          <div className="text-center mb-12">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">Styles</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1] mb-3">
+              Six styles. Hundreds of poses. One app.
+            </h2>
+            <p className="text-[15px] text-[#1C1C1C]/50">Every style has its own pose library, transitions, and expert-crafted flows.</p>
+          </div>
 
-      {/* Section 10: Testimonials */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-12">
-            What Kaira Users Are{" "}
-            <span className="gradient-text">Saying</span>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials
-              .slice(0, showAllTestimonials ? testimonials.length : 3)
-              .map((t) => (
-                <div
-                  key={t.name}
-                  className="border border-[#D5D8DC] rounded-[15px] p-6"
-                >
-                  <p className="text-[#666] leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
-                  <div>
-                    <p className="font-semibold text-[#262626]">{t.name}</p>
-                    <p className="text-sm text-[#666]">{t.role}</p>
+          <div className="flex items-center justify-center gap-2 mb-12 flex-wrap">
+            {["ALL", "VINYASA", "YIN", "RESTORATIVE", "CHAIR", "KUNDALINI"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setActiveStyle(s)}
+                className={`btn-press text-[12px] font-semibold tracking-[0.08em] uppercase px-5 py-2 rounded-full border transition-colors duration-200 ${activeStyle === s ? "bg-[#1C1C1C] text-white border-[#1C1C1C]" : "bg-transparent text-[#1C1C1C] border-[#1C1C1C]/15 hover:border-[#1C1C1C]/30"}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {styles.map((style) => (
+              <div key={style.name} className={`${style.color} rounded-2xl p-5 min-h-[200px] flex flex-col justify-between group cursor-pointer transition-transform duration-300 hover:scale-[1.02]`}>
+                <div className="flex justify-between items-start">
+                  <span className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#1C1C1C]/50">{style.name.split(" ")[0]}</span>
+                  <Cross />
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-[#1C1C1C] mb-1">{style.name}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-[#1C1C1C]/50">12 flows</span>
+                    <div className="w-7 h-7 rounded-full bg-[#1C1C1C]/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 2l5 5-5 5" stroke="#1C1C1C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
-          {!showAllTestimonials && (
-            <div className="text-center mt-8">
-              <button
-                onClick={() => setShowAllTestimonials(true)}
-                className="bg-white text-[#262626] border border-[#262626] rounded-full px-6 py-2 text-base hover:bg-gray-50 transition-colors"
-              >
-                Load More
-              </button>
+        </div>
+      </section>
+
+      {/* Sequence Builder: split layout */}
+      <section className="py-24 bg-[#E8E1D8]">
+        <div className="max-w-[1360px] mx-auto px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">Sequence Builder</p>
+              <h2 className="text-[clamp(2rem,5vw,3.2rem)] font-bold tracking-[-0.02em] leading-[1.05] mb-6">
+                Build a complete flow in under 5 minutes
+              </h2>
+              <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60 mb-4 max-w-[440px]">
+                Filter by style, chakra, meridian, benefit, or name. Kaira suggests poses that naturally follow your choices, so your sequences unfold with clarity and purpose.
+              </p>
+              <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60 mb-8 max-w-[440px]">
+                No more guesswork. No more scribbling on paper. Just smart, personalized flow, built in seconds.
+              </p>
+              <div className="flex items-center gap-3">
+                <a href="#pricing" className="btn-press text-[12px] font-semibold tracking-[0.08em] uppercase bg-[#1C1C1C] text-white px-7 py-3.5 rounded-full hover:bg-[#333] transition-colors duration-200">
+                  Try the Builder
+                </a>
+                <ArrowBtn />
+              </div>
             </div>
-          )}
+            {/* Phone mockups placeholder */}
+            <div className="flex gap-4 justify-center">
+              <div className="w-[200px] h-[400px] bg-[#F2EDE6] rounded-[24px] flex items-center justify-center">
+                <span className="text-[12px] text-[#8A8478]">Builder</span>
+              </div>
+              <div className="w-[200px] h-[400px] bg-[#F2EDE6] rounded-[24px] flex items-center justify-center mt-12">
+                <span className="text-[12px] text-[#8A8478]">Player</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Section 11: Create, Share, Connect */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-            Create, Share, and{" "}
-            <span className="gradient-text">Connect</span>
-          </h2>
-          <p className="text-[#666] leading-relaxed mb-6">
-            Yoga is better together. Share your sequences with friends, students, or the Kaira community.
-            Connect with teachers. Discover new flows created by practitioners around the world.
-          </p>
-          <p className="text-sm text-[#999]">Coming soon</p>
-        </div>
-      </section>
-
-      {/* Section 12: Practice Freely */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-          <div className="flex-1">
-            <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-              Practice Freely.{" "}
-              <span className="gradient-text">Evolve Endlessly.</span>
+      {/* Features list */}
+      <section className="py-24 relative">
+        <Cross className="absolute top-8 right-8" />
+        <div className="max-w-[1360px] mx-auto px-8">
+          <div className="text-center mb-16">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">Features</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1]">
+              Everything you need. Nothing you don&apos;t.
             </h2>
-            <p className="text-[#666] leading-relaxed mb-6">
-              Kaira isn&apos;t just another app. It&apos;s a platform designed to grow with your practice.
-              Whether you&apos;re stepping onto the mat for the first time or you&apos;ve been teaching for decades,
-              Kaira adapts to where you are and where you want to go.
-            </p>
           </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-full max-w-[450px] h-[360px] bg-gray-100 rounded-[16px] flex items-center justify-center">
-              <span className="text-[#666] text-sm">Cards Overview</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 13: Feature Highlights */}
-      <section className="py-24 bg-[#F5F0E8]">
-        <div className="max-w-[800px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-12">
-            Feature{" "}
-            <span className="gradient-text">Highlights</span>
-          </h2>
-          <div className="space-y-6">
-            {features.map((f) => (
-              <div key={f.title} className="flex items-start gap-4">
-                <span className="text-2xl mt-1">{f.icon}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { title: "Sequence Builder", desc: "Design flows with smart pose suggestions. Filter by style, chakra, meridian, or benefit. Teachers cut class prep time by 70%.", color: "bg-[#C5D8C0]" },
+              { title: "Sequence Player", desc: "Get guided through your flows with voice cues, gong transitions, or full video. Practice at your pace, on your terms.", color: "bg-[#C0CED8]" },
+              { title: "Pre-Made Flows", desc: "Expert-crafted sequences for energy, relaxation, flexibility, and strength. 10 to 90 minutes. Pick and play.", color: "bg-[#E8DFC0]" },
+              { title: "Pose Library", desc: "Every pose with alignment cues, modifications for different levels, and video guidance from certified instructors.", color: "bg-[#E8C4C0]" },
+              { title: "Multi-Style", desc: "Hatha Vinyasa, Yin, Restorative, Chair Yoga, Kundalini, and Meditation. All in one place. Switch styles between sessions.", color: "bg-[#D0C5D8]" },
+              { title: "Smart Filtering", desc: "Find poses by chakra, meridian, benefit, body area, or difficulty. Build intentional sequences, not random ones.", color: "bg-[#C5D8D0]" },
+            ].map((f) => (
+              <div key={f.title} className={`${f.color} rounded-2xl p-7 min-h-[180px] flex flex-col justify-between`}>
+                <Cross className="self-end" />
                 <div>
-                  <h3 className="text-xl font-semibold mb-1">{f.title}</h3>
-                  <p className="text-[#666] leading-relaxed">{f.desc}</p>
+                  <h3 className="text-[16px] font-semibold mb-1.5">{f.title}</h3>
+                  <p className="text-[14px] text-[#1C1C1C]/60 leading-[1.6]">{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -380,297 +320,293 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 14: Bonuses */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-2">
-            <span className="gradient-text">Bonuses</span>
-          </h2>
-          <p className="text-[#666] mb-12">Only when you subscribe on this website</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="border border-[#D5D8DC] rounded-[16px] p-6">
-              <p className="text-2xl mb-3">📖</p>
-              <h3 className="font-semibold mb-2">Kaira Monthly Magazine</h3>
-              <p className="text-sm text-[#666]">A digital yoga magazine delivered to your inbox every month with sequences, tips, and inspiration.</p>
-            </div>
-            <div className="border border-[#D5D8DC] rounded-[16px] p-6">
-              <p className="text-2xl mb-3">💬</p>
-              <h3 className="font-semibold mb-2">Private Community</h3>
-              <p className="text-sm text-[#666]">Access our private Telegram group. Connect with fellow practitioners, share flows, and get support.</p>
-            </div>
-            <div className="border border-[#D5D8DC] rounded-[16px] p-6">
-              <p className="text-2xl mb-3">🔒</p>
-              <h3 className="font-semibold mb-2">Locked-In Price</h3>
-              <p className="text-sm text-[#666]">Your subscription price will never increase. Lock in today&apos;s rate for as long as you stay subscribed.</p>
-            </div>
+      {/* Testimonials */}
+      <section className="py-24 bg-[#1C1C1C] relative overflow-hidden">
+        <Cross className="absolute top-8 left-8" light />
+        <Cross className="absolute top-8 right-8" light />
+        <div className="max-w-[1360px] mx-auto px-8">
+          <div className="text-center mb-16">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-white/30 mb-4">From beta testers</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1] text-white">
+              Teachers, practitioners, beginners.
+            </h2>
+            <p className="text-[15px] text-white/30 mt-3">
+              Real feedback from early users.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {testimonials.map((t) => (
+              <div key={t.name} className="bg-white/[0.05] border border-white/[0.08] rounded-2xl p-7">
+                <p className="text-[15px] leading-[1.7] text-white/60 mb-8">&ldquo;{t.text}&rdquo;</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/10" />
+                  <div>
+                    <p className="text-[14px] font-semibold text-white">{t.name}</p>
+                    <p className="text-[12px] text-white/40">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Section 15: Pricing */}
-      <section id="pricing" className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-4">
-            Practice on{" "}
-            <span className="gradient-text">Your Terms</span>
-          </h2>
-          <p className="text-center text-[#666] max-w-[600px] mx-auto mb-12">
-            All plans include every current and future feature, plus all the bonuses.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[900px] mx-auto">
+      {/* Pricing */}
+      <section id="pricing" className="py-24 relative">
+        <Cross className="absolute top-8 left-8" />
+        <Cross className="absolute top-8 right-8" />
+        <div className="max-w-[1000px] mx-auto px-8">
+          <div className="text-center mb-6">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">Pricing</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1] mb-3">
+              Practice on your terms
+            </h2>
+            <p className="text-[15px] text-[#1C1C1C]/50">
+              All plans include every current and future feature, plus all bonuses. No tiers. No feature gates.
+            </p>
+          </div>
+
+          {/* Billing toggle */}
+          <div className="flex items-center justify-center gap-2 mb-12">
+            <button
+              onClick={() => setBillingCycle("monthly")}
+              className={`btn-press text-[12px] font-semibold tracking-[0.08em] uppercase px-5 py-2 rounded-full transition-colors duration-200 ${billingCycle === "monthly" ? "bg-[#1C1C1C] text-white" : "border border-[#1C1C1C]/15 text-[#1C1C1C]"}`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingCycle("annual")}
+              className={`btn-press text-[12px] font-semibold tracking-[0.08em] uppercase px-5 py-2 rounded-full transition-colors duration-200 ${billingCycle === "annual" ? "bg-[#1C1C1C] text-white" : "border border-[#1C1C1C]/15 text-[#1C1C1C]"}`}
+            >
+              Annual
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Monthly */}
-            <div className="border border-[#D5D8DC] rounded-[10px] p-6 text-center">
-              <span className="inline-block bg-gray-100 text-[#666] text-xs font-medium px-3 py-1 rounded-full mb-4">
-                Try It First
-              </span>
-              <h3 className="text-xl font-bold mb-2">Monthly</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-[#2EBA68]">$14.99</span>
-                <span className="text-sm text-[#666]">/month</span>
+            <div className="bg-white rounded-2xl p-7 flex flex-col border border-[#1C1C1C]/8">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-[#8A8478]">Monthly</p>
+                <span className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[#8A8478] bg-[#F2EDE6] px-3 py-1 rounded-full">Try it first</span>
               </div>
-              <ul className="text-sm text-[#666] text-left space-y-2 mb-6">
-                <li>✓ Intelligent Sequence Builder</li>
-                <li>✓ Sequence Player</li>
-                <li>✓ Pre-Made Flows</li>
-                <li>✓ Advanced Filtering</li>
-                <li>✓ Multi-Style Support</li>
+              <div className="mb-6">
+                <span className="text-[42px] font-bold tracking-[-0.03em]">$14.99</span>
+                <span className="text-[14px] text-[#8A8478] ml-1">/ month</span>
+              </div>
+              <ul className="space-y-3 mb-8 flex-1">
+                {["Intelligent Sequence Builder", "Sequence Player", "Pre-Made Flows", "Pose Library", "Multi-Style Support"].map((f) => (
+                  <li key={f} className="text-[14px] text-[#1C1C1C]/70 flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#C5D8C0] flex items-center justify-center shrink-0">
+                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#1C1C1C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
               </ul>
-              <a
-                href="#"
-                className="block w-full bg-[#F0965A] text-white rounded-full py-3 font-medium hover:bg-[#E08548] transition-colors"
-              >
+              <a href="#" className="btn-press text-center text-[12px] font-semibold tracking-[0.08em] uppercase border border-[#1C1C1C]/15 text-[#1C1C1C] py-3.5 rounded-full hover:bg-[#1C1C1C]/5 transition-colors duration-200">
                 Get Monthly Access
               </a>
             </div>
 
-            {/* Quarterly */}
-            <div className="border-2 border-[#F0965A] rounded-[10px] p-6 text-center relative">
-              <span className="inline-block bg-[#F0965A] text-white text-xs font-medium px-3 py-1 rounded-full mb-4">
-                🔥 Popular Choice
-              </span>
-              <h3 className="text-xl font-bold mb-2">Quarterly</h3>
+            {/* Quarterly - popular */}
+            <div className="bg-[#E8C4C0] rounded-2xl p-7 flex flex-col relative">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-[#1C1C1C]/50">Quarterly</p>
+                <span className="text-[10px] font-semibold tracking-[0.1em] uppercase bg-white text-[#1C1C1C] px-3 py-1 rounded-full">Most popular</span>
+              </div>
               <div className="mb-1">
-                <span className="text-sm text-[#666] line-through">$79.99</span>
+                <span className="text-[14px] text-[#1C1C1C]/40 line-through">$79.99</span>
               </div>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-[#2EBA68]">$42.99</span>
-                <span className="text-sm text-[#666]">/quarter</span>
+              <div className="mb-2">
+                <span className="text-[42px] font-bold tracking-[-0.03em]">$42.99</span>
+                <span className="text-[14px] text-[#1C1C1C]/50 ml-1">/ quarter</span>
               </div>
-              <p className="text-xs text-[#2EBA68] font-bold mb-4">Save 50%</p>
-              <ul className="text-sm text-[#666] text-left space-y-2 mb-2">
-                <li>✓ Everything in Monthly</li>
-                <li>✓ Kaira Monthly Magazine</li>
-                <li>✓ Private Community Access</li>
-                <li>✓ Locked-In Price</li>
+              <p className="text-[12px] font-semibold text-[#3D8B5E] mb-6">Save 50% now</p>
+              <ul className="space-y-3 mb-4 flex-1">
+                {["Intelligent Sequence Builder", "Sequence Player", "Pre-Made Flows", "Pose Library", "Multi-Style Support"].map((f) => (
+                  <li key={f} className="text-[14px] text-[#1C1C1C]/70 flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-white/60 flex items-center justify-center shrink-0">
+                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#1C1C1C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
               </ul>
-              <a
-                href="#"
-                className="block w-full bg-[#F0965A] text-white rounded-full py-3 font-medium hover:bg-[#E08548] transition-colors mt-4"
-              >
+              {/* Bonus box */}
+              <div className="bg-white/30 rounded-xl p-4 mb-6">
+                <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#1C1C1C]/50 mb-2">Web-only bonuses</p>
+                <ul className="space-y-1.5">
+                  {["Kaira Monthly digital magazine", "Private community access", "Price locked for life"].map((b) => (
+                    <li key={b} className="text-[13px] text-[#1C1C1C]/70">{b}</li>
+                  ))}
+                </ul>
+              </div>
+              <a href="#" className="btn-press text-center text-[12px] font-semibold tracking-[0.08em] uppercase bg-[#1C1C1C] text-white py-3.5 rounded-full hover:bg-[#333] transition-colors duration-200">
                 Get Quarterly Access
               </a>
             </div>
 
             {/* Yearly */}
-            <div className="border border-[#D5D8DC] rounded-[10px] p-6 text-center">
-              <span className="inline-block bg-[#2EBA68] text-white text-xs font-medium px-3 py-1 rounded-full mb-4">
-                🏆 Best Value
-              </span>
-              <h3 className="text-xl font-bold mb-2">Yearly</h3>
+            <div className="bg-white rounded-2xl p-7 flex flex-col border-2 border-[#3D8B5E]/30 relative">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-[12px] font-semibold tracking-[0.1em] uppercase text-[#8A8478]">Yearly</p>
+                <span className="text-[10px] font-semibold tracking-[0.1em] uppercase bg-[#3D8B5E] text-white px-3 py-1 rounded-full">Best value</span>
+              </div>
               <div className="mb-1">
-                <span className="text-sm text-[#666] line-through">$259.99</span>
+                <span className="text-[14px] text-[#8A8478] line-through">$259.99</span>
               </div>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-[#2EBA68]">$129.99</span>
-                <span className="text-sm text-[#666]">/year</span>
+              <div className="mb-2">
+                <span className="text-[42px] font-bold tracking-[-0.03em]">$129.99</span>
+                <span className="text-[14px] text-[#8A8478] ml-1">/ year</span>
               </div>
-              <p className="text-xs text-[#2EBA68] font-bold mb-4">Save 50%</p>
-              <ul className="text-sm text-[#666] text-left space-y-2 mb-2">
-                <li>✓ Everything in Monthly</li>
-                <li>✓ Kaira Monthly Magazine</li>
-                <li>✓ Private Community Access</li>
-                <li>✓ Locked-In Price</li>
+              <p className="text-[12px] font-semibold text-[#3D8B5E] mb-6">Save 50%. That&apos;s $10.83/month.</p>
+              <ul className="space-y-3 mb-4 flex-1">
+                {["Intelligent Sequence Builder", "Sequence Player", "Pre-Made Flows", "Pose Library", "Multi-Style Support"].map((f) => (
+                  <li key={f} className="text-[14px] text-[#1C1C1C]/70 flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full bg-[#C5D8C0] flex items-center justify-center shrink-0">
+                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#1C1C1C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </span>
+                    {f}
+                  </li>
+                ))}
               </ul>
-              <a
-                href="#"
-                className="block w-full bg-[#F0965A] text-white rounded-full py-3 font-medium hover:bg-[#E08548] transition-colors mt-4"
-              >
+              {/* Bonus box */}
+              <div className="bg-[#F2EDE6] rounded-xl p-4 mb-6">
+                <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#8A8478] mb-2">Web-only bonuses</p>
+                <ul className="space-y-1.5">
+                  {["Kaira Monthly digital magazine", "Private community access", "Price locked for life"].map((b) => (
+                    <li key={b} className="text-[13px] text-[#1C1C1C]/70">{b}</li>
+                  ))}
+                </ul>
+              </div>
+              <a href="#" className="btn-press text-center text-[12px] font-semibold tracking-[0.08em] uppercase bg-[#1C1C1C] text-white py-3.5 rounded-full hover:bg-[#333] transition-colors duration-200">
                 Get Yearly Access
               </a>
             </div>
           </div>
-          <p className="text-center mt-8">
-            <span className="inline-block bg-[#0F1C2E] text-white text-sm px-6 py-3 rounded-full">
-              Cancel anytime. No commitments. Total freedom.
-            </span>
-          </p>
-        </div>
-      </section>
 
-      {/* Section 16: Origin Story */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 text-center">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] mb-4">
-            We Built the World&apos;s #1{" "}
-            <span className="gradient-text">Yoga Decks</span>
-          </h2>
-          <p className="text-[#666] leading-relaxed mb-8">
-            Now, we&apos;re redefining what a{" "}
-            <span className="gradient-text font-semibold">yoga app</span>{" "}
-            can be. From physical cards used in 100+ countries to a digital platform trusted by
-            thousands. Same team. Same passion. Bigger vision.
-          </p>
-          <div className="flex justify-center gap-4">
-            <span className="bg-[#0F1C2E] text-white px-6 py-3 rounded-full text-sm font-bold">
-              +100K CUSTOMERS
-            </span>
-            <span className="bg-[#0F1C2E] text-white px-6 py-3 rounded-full text-sm font-bold">
-              +71 COUNTRIES
-            </span>
+          {/* Below pricing */}
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-6 bg-[#1C1C1C] text-white rounded-full px-8 py-3">
+              <span className="text-[12px] tracking-[0.08em] uppercase font-medium">Cancel anytime</span>
+              <span className="text-white/20">|</span>
+              <span className="text-[12px] tracking-[0.08em] uppercase font-medium">No commitments</span>
+              <span className="text-white/20">|</span>
+              <span className="text-[12px] tracking-[0.08em] uppercase font-medium">Save 15-30% vs. app stores</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Section 17: Team */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-12">
-            Meet the{" "}
-            <span className="gradient-text">Team</span>
-          </h2>
-          <div className="space-y-12">
-            {teamMembers.map((member, i) => (
-              <div
-                key={member.name}
-                className={`flex flex-col ${i % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"} items-center gap-8`}
-              >
-                <div className="w-full lg:w-[480px] h-[320px] bg-gray-100 rounded-[16px] flex items-center justify-center shrink-0">
-                  <span className="text-[#666] text-sm">{member.name}&apos;s Photo</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-1">{member.name}</h3>
-                  <p className="text-[#F0965A] font-medium mb-3">{member.role}</p>
-                  <p className="text-[#666] leading-relaxed">{member.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 18: Roadmap */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-4">
-            What&apos;s Live.{" "}
-            <span className="gradient-text">What&apos;s Next.</span>
-          </h2>
-          <p className="text-center text-[#666] mb-12">
-            Bootstrapped and live. Here&apos;s where we are and where we&apos;re heading.
-          </p>
-
-          <div className="mb-8">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-3 h-3 bg-[#2EBA68] rounded-full inline-block"></span>
-              Live Now
-            </h3>
-            <ul className="space-y-2 text-[#666]">
-              <li>✓ Intelligent Sequence Builder with smart suggestions</li>
-              <li>✓ Sequence Player with voice and gong guidance</li>
-              <li>✓ Pre-Made Flows by certified teachers</li>
-              <li>✓ Multi-style support (Hatha Vinyasa, Yin, Restorative, Chair)</li>
-              <li>✓ Detailed pose information and video guides</li>
-            </ul>
-          </div>
-
-          <div className="mb-8">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-3 h-3 bg-[#F0965A] rounded-full inline-block"></span>
-              In Development
-            </h3>
-            <ul className="space-y-2 text-[#666]">
-              <li>○ AI-powered personalized flow recommendations</li>
-              <li>○ Card scanning (physical deck to digital sequence)</li>
-              <li>○ Social sharing and community features</li>
-              <li>○ Additional yoga styles</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-3 h-3 bg-[#6B73B5] rounded-full inline-block"></span>
-              Future
-            </h3>
-            <ul className="space-y-2 text-[#666]">
-              <li>○ Teacher-student connection and booking</li>
-              <li>○ Meditation, mantras, and chanting content</li>
-              <li>○ Web version</li>
-              <li>○ Marketplace for teacher sequences</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 19: FAQ */}
-      <section className="py-24 bg-white">
-        <div className="max-w-[800px] mx-auto px-6">
-          <h2 className="text-3xl lg:text-[40px] font-bold leading-[1] text-center mb-12">
-            <span className="gradient-text">FAQ</span>
-          </h2>
-          <div className="divide-y divide-[#D5D8DC]">
-            {faqs.map((faq, i) => (
-              <div key={i} className="py-4">
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full text-left flex items-center justify-between text-base font-semibold"
-                >
-                  {faq.q}
-                  <span className="text-xl ml-4 shrink-0">
-                    {openFaq === i ? "−" : "+"}
-                  </span>
-                </button>
-                {openFaq === i && (
-                  <p className="mt-3 text-[#666] leading-relaxed">{faq.a}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 20: Footer */}
-      <footer className="bg-[#0F1C2E] py-12">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-center md:text-left">
-              <div className="text-2xl font-bold mb-2">
-                <span className="gradient-text">Kaira</span>
-              </div>
-              <p className="text-white/60 text-sm">
-                Your practice, your flow.
+      {/* Team / Origin story */}
+      <section className="py-24 bg-[#E8E1D8] relative">
+        <Cross className="absolute top-8 left-8" />
+        <div className="max-w-[1360px] mx-auto px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-16 items-start">
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">Our story</p>
+              <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1] mb-6">
+                We built this because we needed it
+              </h2>
+              <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60 mb-4">
+                We&apos;re yoga teachers and practitioners who got tired of planning classes on paper and following cookie-cutter video apps. So we built the tool we wished existed.
+              </p>
+              <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60 mb-4">
+                Bootstrapped. No investors. No board meetings. Just a small team obsessed with making yoga practice more personal.
+              </p>
+              <p className="text-[16px] leading-[1.8] text-[#1C1C1C]/60">
+                Everything we earn goes back into building Kaira.
               </p>
             </div>
-            <div className="flex gap-6 text-sm">
-              <a href="#" className="text-[#F0965A] hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="text-[#F0965A] hover:text-white transition-colors">Terms of Use</a>
-              <a href="#" className="text-[#F0965A] hover:text-white transition-colors">Contact</a>
-            </div>
-            <div className="flex gap-3">
-              {["Instagram", "YouTube", "Facebook"].map((social) => (
-                <span
-                  key={social}
-                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-[#F0965A] text-xs font-bold"
-                >
-                  {social[0]}
-                </span>
+            <div className="flex gap-4">
+              {team.map((m, i) => (
+                <div key={m.name} className="flex-1">
+                  <div className={`aspect-[3/4] bg-[#F2EDE6] rounded-2xl mb-3 ${i === 1 ? "mt-8" : ""}`} />
+                  <p className="text-[14px] font-semibold">{m.name}</p>
+                  <p className="text-[12px] text-[#8A8478]">{m.role}</p>
+                </div>
               ))}
             </div>
           </div>
-          <div className="mt-8 pt-6 border-t border-white/10 text-center">
-            <p className="text-white/40 text-xs">
-              Kaira is a project by Kaira Ltd. All rights reserved.
-            </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-24 relative">
+        <Cross className="absolute top-8 right-8" />
+        <div className="max-w-[700px] mx-auto px-8">
+          <div className="text-center mb-16">
+            <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-[#8A8478] mb-4">FAQ</p>
+            <h2 className="text-[clamp(1.8rem,4vw,2.8rem)] font-bold tracking-[-0.02em] leading-[1.1]">
+              Questions & answers
+            </h2>
           </div>
+          <div>
+            {faqs.map((category) => (
+              <div key={category.category} className="mb-8">
+                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#8A8478] mb-3">{category.category}</p>
+                {category.items.map((faq) => {
+                  const globalIndex = faqFlat.indexOf(faq);
+                  return (
+                    <div key={globalIndex} className="border-b border-[#1C1C1C]/8">
+                      <button
+                        onClick={() => setOpenFaq(openFaq === globalIndex ? null : globalIndex)}
+                        className="w-full text-left flex items-center justify-between py-5 group"
+                      >
+                        <span className="text-[15px] font-medium pr-4">{faq.q}</span>
+                        <span className="w-8 h-8 rounded-full border border-[#1C1C1C]/10 flex items-center justify-center shrink-0 text-[#8A8478] transition-transform duration-200" style={{ transform: openFaq === globalIndex ? 'rotate(45deg)' : 'none' }}>
+                          +
+                        </span>
+                      </button>
+                      <div
+                        className="overflow-hidden transition-all duration-300"
+                        style={{ maxHeight: openFaq === globalIndex ? '300px' : '0', opacity: openFaq === globalIndex ? 1 : 0 }}
+                      >
+                        <p className="text-[14px] leading-[1.7] text-[#1C1C1C]/60 pb-5">{faq.a}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 bg-[#1C1C1C] relative overflow-hidden">
+        <Cross className="absolute top-8 left-8" light />
+        <Cross className="absolute bottom-8 right-8" light />
+        <div className="max-w-[700px] mx-auto px-8 text-center">
+          <p className="text-[12px] font-semibold tracking-[0.25em] uppercase text-white/30 mb-6">Ready to stop following?</p>
+          <h2 className="text-[clamp(2.5rem,6vw,4rem)] font-bold tracking-[-0.03em] leading-[0.95] text-white uppercase mb-6">
+            Build your first flow
+          </h2>
+          <p className="text-[16px] leading-[1.7] text-white/40 mb-3">
+            Design a sequence in under 5 minutes. Practice on your terms.
+          </p>
+          <p className="text-[14px] leading-[1.7] text-white/30 mb-10">
+            Cancel anytime. Every feature included. Web subscribers save 15-30%.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <a href="#pricing" className="btn-press text-[12px] font-semibold tracking-[0.08em] uppercase bg-white text-[#1C1C1C] px-8 py-4 rounded-full hover:bg-white/90 transition-colors duration-200">
+              Start Building Flows
+            </a>
+            <ArrowBtn dark href="#pricing" />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 border-t border-[#1C1C1C]/8">
+        <div className="max-w-[1360px] mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <span className="text-[14px] font-semibold">Kaira</span>
+          <div className="flex gap-8 text-[13px] text-[#8A8478]">
+            <a href="#" className="hover:text-[#1C1C1C] transition-colors duration-200">Privacy</a>
+            <a href="#" className="hover:text-[#1C1C1C] transition-colors duration-200">Terms</a>
+            <a href="#" className="hover:text-[#1C1C1C] transition-colors duration-200">Contact</a>
+          </div>
+          <p className="text-[12px] text-[#8A8478]">Kaira Ltd.</p>
         </div>
       </footer>
     </>

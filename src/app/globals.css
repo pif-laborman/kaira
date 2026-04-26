@@ -1,40 +1,81 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-cta: #F0965A;
-  --color-cta-hover: #E08548;
-  --color-success: #2EBA68;
-  --color-text: #262626;
-  --color-text-secondary: #3F444B;
-  --color-text-muted: #666666;
-  --color-border: #D5D8DC;
-  --color-warm-bg: #F5F0E8;
-  --color-dark-section: #0F1C2E;
+  --color-cream: #F2EDE6;
+  --color-cream-dark: #E8E1D8;
+  --color-charcoal: #1C1C1C;
+  --color-warm-gray: #8A8478;
+  --color-warm-pink: #E8C4C0;
+  --color-warm-green: #C5D8C0;
+  --color-warm-yellow: #E8DFC0;
+  --color-warm-blue: #C0CED8;
+  --color-accent: #D4845A;
+  --color-accent-dark: #C07448;
+  --color-teal: #1A9E8F;
+  --color-success: #3D8B5E;
   --font-sans: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  color: var(--color-text);
-  background: #FFFFFF;
+  color: #1C1C1C;
+  background: #F2EDE6;
+  font-feature-settings: "cv01", "ss01";
 }
 
-.gradient-text {
-  background: linear-gradient(90deg, #1A9E8F 0%, #F0965A 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Decorative cross */
+.cross {
+  position: relative;
+}
+.cross::before,
+.cross::after {
+  content: '';
+  position: absolute;
+  background: rgba(0,0,0,0.12);
+}
+.cross::before {
+  width: 1px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.cross::after {
+  width: 16px;
+  height: 1px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.hero-gradient {
-  background: linear-gradient(-45deg, #0A1628, #0C2D3E, #134E5E, #1A7A6D);
+.cross-light::before,
+.cross-light::after {
+  background: rgba(255,255,255,0.2);
 }
 
-.card-teal { background: linear-gradient(90deg, #1A9E8F, #134E5E); }
-.card-amber { background: linear-gradient(90deg, #F0965A, #D4774A); }
-.card-sage { background: linear-gradient(90deg, #7BAF6E, #3D8B5E); }
-.card-indigo { background: linear-gradient(90deg, #6B73B5, #4A4E8A); }
+/* Button press */
+.btn-press {
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1), background-color 200ms ease;
+}
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Stagger animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up { animation: none; opacity: 1; transform: none; }
+}
