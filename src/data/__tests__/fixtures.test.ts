@@ -1,19 +1,19 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
-import { styles } from "../styles";
-import { chakras } from "../chakras";
-import { categories } from "../categories";
-import { poses } from "../poses";
-import { premadeFlows } from "../premade-flows";
-import { practiceHistory } from "../practice-history";
+import { styles } from "../styles.ts";
+import { chakras } from "../chakras.ts";
+import { categories } from "../categories.ts";
+import { poses } from "../poses.ts";
+import { premadeFlows } from "../premade-flows.ts";
+import { practiceHistory } from "../practice-history.ts";
 import {
   goalOptions,
   painPoints,
   tinderStatements,
   testimonialsByGoal,
   processingMessages,
-} from "../onboarding";
+} from "../onboarding.ts";
 
 describe("styles", () => {
   it("exports 7 yoga styles", () => {
