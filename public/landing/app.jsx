@@ -4,17 +4,10 @@ function App() {
       <main>
         <Hero />
         <LogoTicker />
+        <HowItWorks />
         <Problem />
-        <Builder />
-        <Spread />
-        <Learn />
-        <Premade />
+        <FeatureDemo />
         <Stats />
-        <Player />
-        <Styles />
-        <Beyond />
-        <Manifesto />
-        <Together />
         <Testimonials />
         <Pricing />
         <FAQ />
