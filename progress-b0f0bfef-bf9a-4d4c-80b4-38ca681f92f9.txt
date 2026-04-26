@@ -137,3 +137,16 @@ Started: 2026-04-26
 - 12 new tests: module exports check, removePoses (3 cases), duplicatePoses (3 cases), toggleSideLabel (4 cases), duration recalculation after remove/duplicate (2 cases)
 - **Learnings:** Exporting pure functions from page components makes unit testing edit operations straightforward without needing DOM rendering. The key pattern for duplicate-in-place is iterating the array and pushing the original + copy when selected.
 ---
+
+## 2026-04-26 - US-008: Save sequence modal and library persistence in React state
+- Created SaveSequenceModal component (src/components/SaveSequenceModal.tsx): design system card (18px radius, card padding), name input, Cancel (ghost style) and Save (pill style) buttons
+- Wired overflow menu "Save to Library" on review screen to open modal
+- Save creates a SavedSequence in React Context with: id (Date.now), name, poseIds, durations map, styleId (from first pose), totalDuration, createdAt
+- Added styleId and totalDuration optional fields to SavedSequence interface in AppContext
+- Success toast ("Saved to Library") shown for 2 seconds after saving, modal closes and returns to review screen
+- Updated Library page to render all saved sequences with style color swatch, sequence name, pose count, total duration, style name, and date
+- Empty state message when no sequences saved
+- Files changed: src/components/SaveSequenceModal.tsx, src/app/(app)/builder/review/page.tsx, src/app/(app)/library/page.tsx, src/context/AppContext.tsx, src/components/__tests__/SaveSequence.test.ts
+- 12 tests: modal export, context exports, SavedSequence shape, total duration computation, unique id generation, name trim validation, library page export, formatTotalDuration (6 cases), computed vs stored totalDuration, seed pose id integrity
+- **Learnings:** The SavedSequence interface already existed with seed data in AppContext. Adding optional fields (styleId, totalDuration) is non-breaking for existing seeds. Modal overlay pattern (fixed inset backdrop + centered card + stopPropagation) works well for design system modals.
+---
