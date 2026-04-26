@@ -261,3 +261,17 @@ Started: 2026-04-26
 - 13 tests: module exports (4), togglePoseName (3 cases: false->true, true->false, idempotent), profile data (3: name, email, version), RegistrationMark import, settings rows (2: labels, link href)
 - **Learnings:** ToggleSwitch with role="switch" + aria-checked is the accessible pattern for toggle settings. SettingsRow is a simple flex row pattern reusable for settings lists.
 ---
+
+## 2026-04-26 - US-016: Progress and stats screen with stat cards, calendar heatmap, recent sessions
+- Created /progress route at src/app/(app)/progress/page.tsx
+- 'Your Practice' heading in display-lg typography
+- 4 stat cards in 2x2 grid: Total Sessions, Total Minutes, Current Streak, Poses Practiced. Each uses mono eyebrow label and display-md number value
+- Calendar heatmap: current month grid with weekday headers (S-S), filled dots (--ink) for practiced days, empty dots (--rule) for non-practiced
+- Recent Sessions list: last 5 sessions sorted by date, each showing sequence name, duration, date, and style pill (tag-bg mono)
+- Clicking a session loads poses by style into context and navigates to /builder/review
+- Seeded practiceHistory in AppContext with fixture data from practice-history.ts (was previously empty [])
+- Exported pure helpers: computeStats, calculateStreak, getCalendarDays, formatSessionDuration, formatSessionDate
+- Files changed: src/app/(app)/progress/page.tsx (new), src/components/__tests__/Progress.test.ts (new), src/context/AppContext.tsx (seeded practiceHistory)
+- 28 tests: module exports (6), computeStats (4 cases: empty, totalSessions, totalMinutes rounding, posesPracticed), calculateStreak (6 cases: empty, today, consecutive, duplicates, stale, yesterday start), getCalendarDays (4 cases: April days, null padding, first day, Feb non-leap), formatSessionDuration (4 cases), formatSessionDate (1 case), data integrity (3 cases)
+- **Learnings:** practiceHistory in AppContext needed seeding with fixture data for the progress screen to be useful on first load (was [] before). The getCalendarDays helper using firstDay offset + daysInMonth is a clean pattern for month grid rendering.
+---
