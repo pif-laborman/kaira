@@ -215,3 +215,21 @@ Started: 2026-04-26
 - 16 tests: module exports (3), formatTotalDuration (4 cases), filterSequencesByName (6 cases: empty, whitespace, partial, case-insensitive, no match, middle match), seed data integrity (3: context exports, valid pose ids, style color mapping)
 - **Learnings:** Loading a saved sequence into review = set selectedPoses in context from poseIds lookup, then navigate. The thumbnail strip pattern (flex row of colored divs with flex:1) creates an effective visual fingerprint for sequences.
 ---
+
+## 2026-04-26 - US-013: Pre-made flow detail page with teacher, description, and pose grid
+- Created /flow/[id] dynamic route at src/app/(app)/flow/[id]/page.tsx
+- Placeholder header image area (220px) with style color, rounded bottom corners
+- Style pill badge overlaid on header area
+- Back button (icon-btn) and bookmark icon-btn (heart toggle) in header
+- Flow name in display-md, duration pill and difficulty pill in tag-bg
+- Teacher section: placeholder avatar circle (initial letter) + teacher_name in body-lg
+- Description paragraph in body-lg with ink-2 color
+- 3-column pose grid (same layout pattern as review screen) with per-pose +/- duration controls
+- Start split-pill in fixed bottom bar loads poses into context (setSelectedPoses) and navigates to /player
+- Total duration shown in bottom bar with clock icon
+- Not-found state when flow id is invalid
+- Exported pure helpers: formatDuration, resolveFlowPoses for testability
+- Files changed: src/app/(app)/flow/[id]/page.tsx (new), src/components/__tests__/FlowDetail.test.ts (new)
+- 21 tests: module exports, formatDuration (5 cases), resolveFlowPoses (4 cases: valid ids, invalid ids, empty, order preservation), premade flow data integrity (8 cases: valid style_ids, valid pose_ids, teacher names, descriptions, difficulty, duration, unique ids, full resolution), duration constants (3 cases)
+- **Learnings:** resolveFlowPoses pattern (Map lookup from pose array, filter Boolean) is reusable for any pose_ids array resolution. The flow detail page reuses the same pose card layout as review but without edit mode.
+---
