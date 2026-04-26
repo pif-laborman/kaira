@@ -309,3 +309,16 @@ Started: 2026-04-26
 - Files changed: src/app/(fullscreen)/onboarding/page.tsx, src/components/__tests__/Onboarding.test.ts
 - **Learnings:** .ts extensions in imports are only needed in test files for node:test ESM resolution, NOT in app source files (Next.js handles that via its own resolution). The fullscreen route group pattern continues to work well for full-page experiences without BottomNav.
 ---
+
+## 2026-04-26 - US-019: Onboarding steps 8-11 (Processing, Mini-Builder Demo, Value Delivery, Account Gate)
+- Extended onboarding from 7 steps to 11 steps with progress dots spanning all 11
+- Step 8 (Processing): animated progress bar with sequential messages based on user's style/goal preferences, auto-advances after 3 seconds
+- Step 9 (App Demo): mini builder showing 6 poses from preferred style, user selects 3-4, shows "You just built your first flow" confirmation with selection strip
+- Step 10 (Value Delivery): 3-column review grid of built sequence with per-pose durations, Play Now split-pill navigates to player, Save & Continue saves to library and advances
+- Step 11 (Account Gate): email input + Create Account button (non-functional) + Skip for now link
+- Updated home page to order styles by onboarding preferences (preferred styles first) via orderStylesByPreference helper
+- Bottom CTA logic updated: steps 2-7 show Continue, step 8 auto-advances, step 9 shows Continue when enough poses selected, step 10 has own CTAs, step 11 shows Finish
+- Files changed: src/app/(fullscreen)/onboarding/page.tsx, src/app/(app)/home/page.tsx, src/components/__tests__/Onboarding.test.ts, src/components/__tests__/OnboardingSteps8_11.test.ts (new)
+- 26 new tests: getStepTitle (6 for steps 8-11), getMiniBuilderPoses (5 cases), formatDuration (4 cases), processing messages (3 cases), orderStylesByPreference (3 cases), mini-builder data integrity (1 case), old test fix (step 8 range)
+- **Learnings:** Auto-advancing steps (like processing) use useEffect with setTimeout on step state. The mini-builder reuses pose card patterns from the main builder but simplified. Home page style ordering is a clean sort: preferred first, then rest in original order.
+---
