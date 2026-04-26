@@ -19,7 +19,7 @@ function LogoTicker() {
   const reel = [...marks, ...marks];
 
   return (
-    <section id="ticker" className="frame" style={{ paddingTop: 0, paddingBottom: 'clamp(24px, 3vw, 40px)' }}>
+    <section id="ticker" className="frame" style={{ paddingTop: 'clamp(32px, 4vw, 56px)', paddingBottom: 'clamp(24px, 3vw, 40px)' }}>
       <div className="page" style={{ paddingTop: 0, paddingBottom: 16 }}>
         <div style={{
           display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 24,
