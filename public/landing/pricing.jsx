@@ -1,24 +1,21 @@
 function Pricing() {
-  const [cycle, setCycle] = React.useState('annual');
-
   const plans = [
     {
       id: 'monthly', label: 'Monthly', tagline: 'Try it first',
-      monthly: { price: '$14.99', sub: '/ month', note: 'Billed monthly' },
-      annual:  { price: '$10.83', sub: '/ month', note: 'Upgrade anytime' },
+      price: '$14.99', sub: '/ month', note: 'Billed monthly. Cancel anytime.',
       perks: [], featured: false,
     },
     {
       id: 'quarterly', label: 'Quarterly', tagline: 'Most popular',
-      monthly: { price: '$42.99', sub: '/ quarter', note: 'Save 50% now' },
-      annual:  { price: '$32.49', sub: '/ quarter', note: 'Best mid-term value' },
+      price: '$42.99', sub: '/ quarter', strikePrice: '$79.99',
+      note: '$14.33 / month. Save 46%.',
       perks: ['Kaira Monthly digital magazine', 'Private community access', 'Price locked for life'],
       featured: true,
     },
     {
       id: 'yearly', label: 'Yearly', tagline: 'Best value',
-      monthly: { price: '$129.99', sub: '/ year', note: '$10.83 / month' },
-      annual:  { price: '$129.99', sub: '/ year', note: 'That\'s $10.83 / month' },
+      price: '$129.99', sub: '/ year', strikePrice: '$259.99',
+      note: '$10.83 / month. Save 50%.',
       perks: ['Kaira Monthly digital magazine', 'Private community access', 'Price locked for life'],
       featured: false,
     },
@@ -27,7 +24,7 @@ function Pricing() {
   const baseFeatures = [
     'Intelligent Sequence Builder',
     'Sequence Player with voice & video',
-    'Pre-Made Flows · 10–90 minutes',
+    'Pre-Made Flows, 10 to 90 minutes',
     'Pose Library with alignment cues',
     'Multi-Style support',
   ];
@@ -38,43 +35,20 @@ function Pricing() {
         <span className="reg-mark" style={{ top: 0, left: 8 }} />
         <span className="reg-mark" style={{ top: 0, right: 8 }} />
 
-        <div style={{ textAlign: 'center', maxWidth: 880, margin: '0 auto', padding: '8px 0 32px 0' }}>
+        <div style={{ textAlign: 'center', maxWidth: 880, margin: '0 auto', padding: '8px 0 clamp(32px, 4vw, 48px) 0' }}>
           <div className="eyebrow" style={{ marginBottom: 18 }}>— Pricing</div>
           <h2 className="display-md" style={{ margin: 0, fontSize: 'clamp(28px, 3.6vw, 48px)', lineHeight: 1.18, fontWeight: 600, letterSpacing: '-0.015em' }}>
-            Flexible plans for every body — every current and future feature
-            included, no tiers, no gates.
+            Practice on your terms. Every feature included.
           </h2>
-
-          <div style={{
-            display: 'inline-flex', marginTop: 28,
-            background: 'var(--card)', borderRadius: 999, padding: 4,
-            border: '1px solid var(--rule-2)',
-          }}>
-            {[
-              { id: 'monthly', label: 'Monthly' },
-              { id: 'annual',  label: 'Annual · Save 50%' },
-            ].map(c => (
-              <button key={c.id} onClick={() => setCycle(c.id)}
-                style={{
-                  padding: '11px 22px', fontSize: 12,
-                  fontFamily: "'Hanken Grotesk', sans-serif",
-                  letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600,
-                  borderRadius: 999, cursor: 'pointer',
-                  background: cycle === c.id ? 'var(--ink)' : 'transparent',
-                  color: cycle === c.id ? '#fff' : 'var(--ink-3)',
-                  transition: 'background .25s ease, color .25s ease',
-                }}>
-                {c.label}
-              </button>
-            ))}
-          </div>
+          <p className="body-lg" style={{ marginTop: 16, maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
+            All plans include every current and future feature. No tiers, no gates. Choose the billing cycle that works for you.
+          </p>
         </div>
 
         <div className="pricing-grid" style={{
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(14px, 1.6vw, 22px)',
         }}>
           {plans.map(p => {
-            const view = cycle === 'annual' ? p.annual : p.monthly;
             const featured = p.featured;
             return (
               <article key={p.id} style={{
@@ -82,6 +56,7 @@ function Pricing() {
                 color: featured ? '#fff' : 'var(--ink)',
                 borderRadius: 18, padding: 'clamp(26px, 2.6vw, 36px)',
                 display: 'flex', flexDirection: 'column', gap: 18,
+                border: featured ? 'none' : '1px solid var(--rule-2)',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span className="mono" style={{ color: featured ? 'rgba(255,255,255,0.7)' : 'var(--ink-3)' }}>
@@ -95,13 +70,18 @@ function Pricing() {
                 </div>
 
                 <div>
+                  {p.strikePrice && (
+                    <div style={{ fontSize: 14, textDecoration: 'line-through', color: featured ? 'rgba(255,255,255,0.4)' : 'var(--ink-3)', marginBottom: 2 }}>
+                      {p.strikePrice}
+                    </div>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                     <span className="display" style={{ fontSize: 'clamp(40px, 4.4vw, 60px)', fontWeight: 700, letterSpacing: '-0.025em' }}>
-                      {view.price}
+                      {p.price}
                     </span>
-                    <span className="small" style={{ color: featured ? 'rgba(255,255,255,0.75)' : undefined }}>{view.sub}</span>
+                    <span className="small" style={{ color: featured ? 'rgba(255,255,255,0.75)' : undefined }}>{p.sub}</span>
                   </div>
-                  <div className="small" style={{ marginTop: 4, color: featured ? 'rgba(255,255,255,0.7)' : undefined }}>{view.note}</div>
+                  <div className="small" style={{ marginTop: 4, color: featured ? 'rgba(255,255,255,0.7)' : undefined }}>{p.note}</div>
                 </div>
 
                 <div style={{ borderTop: '1px solid', borderColor: featured ? 'rgba(255,255,255,0.18)' : 'var(--rule-2)', paddingTop: 16 }}>
@@ -123,12 +103,12 @@ function Pricing() {
 
                 {featured ? (
                   <a href="#" className="btn-pill inverted" style={{ marginTop: 'auto' }}>
-                    <span className="label">Choose {p.label}</span>
+                    <span className="label">Get {p.label} Access</span>
                     <span className="arrow"><ArrowRight size={14}/></span>
                   </a>
                 ) : (
                   <a href="#" className="btn-ghost" style={{ marginTop: 'auto', justifyContent: 'space-between' }}>
-                    Choose {p.label}
+                    Get {p.label} Access
                     <ArrowRight size={12}/>
                   </a>
                 )}
@@ -138,7 +118,7 @@ function Pricing() {
         </div>
 
         <div className="small" style={{ textAlign: 'center', marginTop: 22, color: 'var(--ink-3)' }}>
-          Cancel anytime · No commitments · Save 15–30% vs. app stores
+          Cancel anytime · No commitments · Save 15-30% vs. app stores
         </div>
       </div>
       <style>{`
